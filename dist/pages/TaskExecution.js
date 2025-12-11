@@ -1,0 +1,54 @@
+'use client';
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
+import { useUi } from '@hit/ui-kit';
+import { formatDate } from '@hit/sdk';
+import { useTaskExecution } from '../hooks/useTasks';
+export function TaskExecution({ taskName, executionId, onNavigate }) {
+    const { Page, Card, Button, Badge, Alert, Spinner } = useUi();
+    const { execution, loading, error, refresh } = useTaskExecution(taskName, executionId);
+    const navigate = (path) => {
+        if (onNavigate) {
+            onNavigate(path);
+        }
+        else if (typeof window !== 'undefined') {
+            window.location.href = path;
+        }
+    };
+    if (loading) {
+        return (_jsx(Page, { title: "Execution Details", children: _jsx(Spinner, {}) }));
+    }
+    if (error || !execution) {
+        return (_jsx(Page, { title: "Execution Details", children: _jsx(Alert, { variant: "error", title: "Error loading execution", children: error?.message || 'Execution not found' }) }));
+    }
+    const getStatusIcon = (status) => {
+        switch (status) {
+            case 'success':
+                return _jsx(CheckCircle, { className: "text-green-500", size: 20 });
+            case 'failed':
+                return _jsx(XCircle, { className: "text-red-500", size: 20 });
+            case 'running':
+                return _jsx(Clock, { className: "text-yellow-500", size: 20 });
+            default:
+                return _jsx(AlertCircle, { className: "text-gray-500", size: 20 });
+        }
+    };
+    const getStatusBadge = (status) => {
+        switch (status) {
+            case 'success':
+                return _jsx(Badge, { variant: "success", children: "Success" });
+            case 'failed':
+                return _jsx(Badge, { variant: "error", children: "Failed" });
+            case 'running':
+                return _jsx(Badge, { variant: "warning", children: "Running" });
+            case 'pending':
+                return _jsx(Badge, { variant: "default", children: "Pending" });
+            default:
+                return _jsx(Badge, { variant: "default", children: status });
+        }
+    };
+    return (_jsxs(Page, { title: "Execution Details", actions: _jsxs(Button, { variant: "ghost", onClick: () => navigate(`/admin/tasks/${encodeURIComponent(taskName)}`), children: [_jsx(ArrowLeft, { size: 16, className: "mr-2" }), "Back to Task"] }), children: [_jsx("div", { className: "mb-6", children: _jsx(Card, { children: _jsxs("div", { className: "flex items-center gap-4", children: [getStatusIcon(execution.status), _jsxs("div", { className: "flex-1", children: [_jsxs("h3", { className: "text-lg font-semibold", children: ["Execution ", execution.id.slice(0, 8)] }), _jsxs("p", { className: "text-sm text-gray-500", children: ["Task: ", execution.task_name] })] }), _jsx("div", { className: "text-right", children: getStatusBadge(execution.status) })] }) }) }), _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4 mb-6", children: [_jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Execution Information" }), _jsxs("dl", { className: "space-y-2", children: [_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Status" }), _jsx("dd", { children: getStatusBadge(execution.status) })] }), _jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Execution Type" }), _jsx("dd", { children: _jsx(Badge, { variant: execution.execution_type === 'simple' ? 'info' : 'warning', children: execution.execution_type }) })] }), _jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Triggered By" }), _jsx("dd", { className: "text-sm", children: execution.triggered_by || 'system' })] }), execution.k8s_job_name && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "K8s Job" }), _jsx("dd", { className: "text-sm font-mono", children: execution.k8s_job_name })] }))] })] }), _jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Timing" }), _jsxs("dl", { className: "space-y-2", children: [_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Started" }), _jsx("dd", { className: "text-sm", children: execution.started_at ? formatDate(execution.started_at) : '—' })] }), _jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Completed" }), _jsx("dd", { className: "text-sm", children: execution.completed_at ? formatDate(execution.completed_at) : '—' })] }), execution.duration_ms && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Duration" }), _jsx("dd", { className: "text-sm", children: execution.duration_ms < 1000
+                                                    ? `${execution.duration_ms}ms`
+                                                    : `${(execution.duration_ms / 1000).toFixed(2)}s` })] })), execution.rows_affected !== null && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Rows Affected" }), _jsx("dd", { className: "text-sm", children: execution.rows_affected })] }))] })] })] }), execution.error && (_jsx("div", { className: "mb-6", children: _jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4 text-red-600", children: "Error" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap", children: _jsx("code", { children: execution.error }) })] }) })), execution.output && (_jsx("div", { className: "mb-6", children: _jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Output" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap", children: _jsx("code", { children: execution.output }) })] }) })), execution.logs && (_jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Logs" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap", children: _jsx("code", { children: execution.logs }) })] }))] }));
+}
+//# sourceMappingURL=TaskExecution.js.map

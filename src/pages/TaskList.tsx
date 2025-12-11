@@ -99,7 +99,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
             {
               key: 'enabled',
               label: 'Status',
-              render: (_, row) => getStatusBadge(row as Task),
+              render: (_, row) => getStatusBadge(row as unknown as Task),
             },
             {
               key: 'created_at',
@@ -115,7 +115,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
               sortable: false,
               hideable: false,
               render: (_, row) => {
-                const task = row as Task;
+                const task = row as unknown as Task;
                 return (
                   <div className="flex items-center justify-end gap-2">
                     <Button

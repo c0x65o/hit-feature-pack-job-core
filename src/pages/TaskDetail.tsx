@@ -12,7 +12,7 @@ interface TaskDetailProps {
 }
 
 export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
-  const { Page, Card, Button, Badge, DataTable, Alert, Spinner, CodeBlock } = useUi();
+  const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
   const { task, loading: taskLoading, error: taskError, refresh: refreshTask } = useTask(taskName);
   const { executions, total, loading: executionsLoading, refresh: refreshExecutions } = useTaskExecutions(taskName, { limit: 20 });
   const { executeTask, updateSchedule, loading: mutating } = useTaskMutations();
@@ -84,7 +84,7 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
         <div className="flex gap-2">
           {task.cron && (
             <Button
-              variant={task.enabled ? "warning" : "primary"}
+              variant={task.enabled ? "secondary" : "primary"}
               onClick={() => handleToggleSchedule(!task.enabled)}
               loading={mutating}
             >
@@ -149,19 +149,25 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
           {task.sql && (
             <div className="mb-4">
               <dt className="text-sm text-gray-500 mb-2">SQL Query</dt>
-              <CodeBlock language="sql">{task.sql}</CodeBlock>
+              <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto">
+                <code>{task.sql}</code>
+              </pre>
             </div>
           )}
           {task.command && (
             <div className="mb-4">
               <dt className="text-sm text-gray-500 mb-2">Command</dt>
-              <CodeBlock>{task.command}</CodeBlock>
+              <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto">
+                <code>{task.command}</code>
+              </pre>
             </div>
           )}
           {task.script && (
             <div>
               <dt className="text-sm text-gray-500 mb-2">Script</dt>
-              <CodeBlock>{task.script}</CodeBlock>
+              <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto">
+                <code>{task.script}</code>
+              </pre>
             </div>
           )}
         </Card>
@@ -180,7 +186,7 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
             {
               key: 'triggered_by',
               label: 'Triggered By',
-              render: (value) => value || 'system',
+              render: (value) => (value ? String(value) : 'system'),
             },
             {
               key: 'started_at',

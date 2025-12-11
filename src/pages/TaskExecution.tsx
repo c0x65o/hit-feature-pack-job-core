@@ -13,7 +13,7 @@ interface TaskExecutionProps {
 }
 
 export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecutionProps) {
-  const { Page, Card, Button, Badge, Alert, Spinner, CodeBlock } = useUi();
+  const { Page, Card, Button, Badge, Alert, Spinner } = useUi();
   const { execution, loading, error, refresh } = useTaskExecution(taskName, executionId);
 
   const navigate = (path: string) => {
@@ -81,20 +81,22 @@ export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecuti
       }
     >
       {/* Status Card */}
-      <Card className="mb-6">
-        <div className="flex items-center gap-4">
-          {getStatusIcon(execution.status)}
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold">Execution {execution.id.slice(0, 8)}</h3>
-            <p className="text-sm text-gray-500">
-              Task: {execution.task_name}
-            </p>
+      <div className="mb-6">
+        <Card>
+          <div className="flex items-center gap-4">
+            {getStatusIcon(execution.status)}
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Execution {execution.id.slice(0, 8)}</h3>
+              <p className="text-sm text-gray-500">
+                Task: {execution.task_name}
+              </p>
+            </div>
+            <div className="text-right">
+              {getStatusBadge(execution.status)}
+            </div>
           </div>
-          <div className="text-right">
-            {getStatusBadge(execution.status)}
-          </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -163,25 +165,35 @@ export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecuti
 
       {/* Error */}
       {execution.error && (
-        <Card className="mb-6">
-          <h3 className="text-lg font-semibold mb-4 text-red-600">Error</h3>
-          <CodeBlock language="text">{execution.error}</CodeBlock>
-        </Card>
+        <div className="mb-6">
+          <Card>
+            <h3 className="text-lg font-semibold mb-4 text-red-600">Error</h3>
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+              <code>{execution.error}</code>
+            </pre>
+          </Card>
+        </div>
       )}
 
       {/* Output */}
       {execution.output && (
-        <Card className="mb-6">
-          <h3 className="text-lg font-semibold mb-4">Output</h3>
-          <CodeBlock language="text">{execution.output}</CodeBlock>
-        </Card>
+        <div className="mb-6">
+          <Card>
+            <h3 className="text-lg font-semibold mb-4">Output</h3>
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+              <code>{execution.output}</code>
+            </pre>
+          </Card>
+        </div>
       )}
 
       {/* Logs */}
       {execution.logs && (
         <Card>
           <h3 className="text-lg font-semibold mb-4">Logs</h3>
-          <CodeBlock language="text">{execution.logs}</CodeBlock>
+          <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+            <code>{execution.logs}</code>
+          </pre>
         </Card>
       )}
     </Page>
