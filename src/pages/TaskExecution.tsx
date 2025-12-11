@@ -117,7 +117,17 @@ export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecuti
             </div>
             <div>
               <dt className="text-sm text-gray-500">Triggered By</dt>
-              <dd className="text-sm">{execution.triggered_by || 'system'}</dd>
+              <dd className="text-sm">
+                {execution.triggered_by === 'cron' ? (
+                  <Badge variant="info">Cron Schedule</Badge>
+                ) : execution.triggered_by === 'system' || execution.triggered_by === 'manual' ? (
+                  <Badge variant="default">Manual</Badge>
+                ) : execution.triggered_by ? (
+                  <span>{execution.triggered_by}</span>
+                ) : (
+                  <Badge variant="default">System</Badge>
+                )}
+              </dd>
             </div>
             {execution.k8s_job_name && (
               <div>
@@ -150,6 +160,18 @@ export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecuti
                   {execution.duration_ms < 1000
                     ? `${execution.duration_ms}ms`
                     : `${(execution.duration_ms / 1000).toFixed(2)}s`}
+                </dd>
+              </div>
+            )}
+            {execution.exit_code !== null && (
+              <div>
+                <dt className="text-sm text-gray-500">Exit Code</dt>
+                <dd className="text-sm font-mono">
+                  {execution.exit_code === 0 ? (
+                    <span className="text-green-600">{execution.exit_code}</span>
+                  ) : (
+                    <span className="text-red-600">{execution.exit_code}</span>
+                  )}
                 </dd>
               </div>
             )}

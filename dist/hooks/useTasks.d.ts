@@ -28,6 +28,7 @@ export interface TaskExecution {
     logs: string | null;
     error: string | null;
     output: string | null;
+    exit_code: number | null;
     duration_ms: number | null;
     rows_affected: number | null;
     data: Record<string, unknown> | null;

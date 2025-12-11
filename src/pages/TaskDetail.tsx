@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle, Calendar } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatDate } from '@hit/sdk';
@@ -11,11 +11,56 @@ interface TaskDetailProps {
   onNavigate?: (path: string) => void;
 }
 
+// Helper to get current user email from token
+function getCurrentUserEmail(): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    // Try to get token from localStorage
+    const token = localStorage.getItem('hit_token') || localStorage.getItem('auth_token');
+    if (!token) return null;
+    
+    // Decode JWT token to get email
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const payload = JSON.parse(atob(parts[1]));
+      return payload.email || payload.sub || null;
+    }
+  } catch (e) {
+    // Token parsing failed, try fetching from /me endpoint
+  }
+  
+  return null;
+}
+
+// Helper to fetch current user from /me endpoint
+async function fetchCurrentUserEmail(): Promise<string | null> {
+  try {
+    const response = await fetch('/api/proxy/auth/me', {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data.email || null;
+    }
+  } catch (e) {
+    // Fallback to token parsing
+  }
+  
+  return getCurrentUserEmail();
+}
+
 export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
   const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
   const { task, loading: taskLoading, error: taskError, refresh: refreshTask } = useTask(taskName);
   const { executions, total, loading: executionsLoading, refresh: refreshExecutions } = useTaskExecutions(taskName, { limit: 20 });
   const { executeTask, updateSchedule, loading: mutating } = useTaskMutations();
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+
+  // Get current user email on mount
+  useEffect(() => {
+    fetchCurrentUserEmail().then(setCurrentUserEmail);
+  }, []);
 
   const navigate = (path: string) => {
     if (onNavigate) {
@@ -27,7 +72,9 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
 
   const handleExecute = async () => {
     try {
-      await executeTask(taskName);
+      // Pass current user email as triggered_by, or 'manual' if not available
+      const triggeredBy = currentUserEmail || 'manual';
+      await executeTask(taskName, triggeredBy);
       refreshExecutions();
     } catch (err) {
       // Error handled by hook
@@ -186,7 +233,17 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
             {
               key: 'triggered_by',
               label: 'Triggered By',
-              render: (value) => (value ? String(value) : 'system'),
+              render: (value) => {
+                const triggeredBy = value ? String(value) : 'system';
+                // Show badge for cron vs manual vs user
+                if (triggeredBy === 'cron') {
+                  return <Badge variant="info">Cron</Badge>;
+                } else if (triggeredBy === 'system' || triggeredBy === 'manual') {
+                  return <Badge variant="default">Manual</Badge>;
+                } else {
+                  return <span className="text-sm">{triggeredBy}</span>;
+                }
+              },
             },
             {
               key: 'started_at',
@@ -206,6 +263,19 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
                 const ms = Number(value);
                 if (ms < 1000) return `${ms}ms`;
                 return `${(ms / 1000).toFixed(2)}s`;
+              },
+            },
+            {
+              key: 'exit_code',
+              label: 'Exit Code',
+              render: (value) => {
+                if (value === null || value === undefined) return '—';
+                const code = Number(value);
+                return (
+                  <span className={code === 0 ? 'text-green-600' : 'text-red-600'}>
+                    {code}
+                  </span>
+                );
               },
             },
             {
@@ -232,6 +302,7 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
             started_at: ex.started_at,
             completed_at: ex.completed_at,
             duration_ms: ex.duration_ms,
+            exit_code: ex.exit_code,
           }))}
           emptyMessage="No executions yet"
           loading={executionsLoading}
