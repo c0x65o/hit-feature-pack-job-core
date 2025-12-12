@@ -161,7 +161,7 @@ export function TaskList({ onNavigate }) {
                         cron: task.cron,
                         enabled: task.enabled,
                         created_at: task.created_at,
-                    })), emptyMessage: "No tasks found. Tasks are synced from hit.yaml during deployment. Click 'Sync Tasks' to manually sync them now.", loading: loading, searchable: true, exportable: true, showColumnVisibility: true }) })] }));
+                    })), emptyMessage: "No tasks found. Tasks are synced from hit.yaml during deployment. Click 'Sync Tasks' to manually sync them now.", loading: loading, searchable: true, exportable: true, showColumnVisibility: true, onRefresh: refresh }) })] }));
 }
 export default TaskList;
 //# sourceMappingURL=TaskList.js.map

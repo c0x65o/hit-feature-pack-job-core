@@ -250,6 +250,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
           searchable
           exportable
           showColumnVisibility
+          onRefresh={refresh}
         />
       </Card>
     </Page>
