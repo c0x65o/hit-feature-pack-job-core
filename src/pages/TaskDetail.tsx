@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle, Calendar } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
-import { formatDate } from '@hit/sdk';
+import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle, Calendar, ListChecks } from 'lucide-react';
+import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
+import { formatDateTime } from '@hit/sdk';
 import { useTask, useTaskExecutions, useTaskMutations, type Task } from '../hooks/useTasks';
 
 interface TaskDetailProps {
@@ -123,10 +123,17 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
     }
   };
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Tasks', href: '/admin/tasks', icon: <ListChecks size={14} /> },
+    { label: task.name },
+  ];
+
   return (
     <Page
       title={task.name}
       description={task.description || undefined}
+      breadcrumbs={breadcrumbs}
+      onNavigate={navigate}
       actions={
         <div className="flex gap-2">
           {task.cron && (
@@ -248,12 +255,12 @@ export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
             {
               key: 'started_at',
               label: 'Started',
-              render: (value) => value ? formatDate(String(value)) : '—',
+              render: (value) => value ? formatDateTime(String(value)) : '—',
             },
             {
               key: 'completed_at',
               label: 'Completed',
-              render: (value) => value ? formatDate(String(value)) : '—',
+              render: (value) => value ? formatDateTime(String(value)) : '—',
             },
             {
               key: 'duration_ms',

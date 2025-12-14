@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
-import { formatDate } from '@hit/sdk';
-import { useTaskExecution, type TaskExecution } from '../hooks/useTasks';
+import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle, ListChecks, PlayCircle } from 'lucide-react';
+import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
+import { formatDateTime } from '@hit/sdk';
+import { useTaskExecution, type TaskExecution as TaskExecutionType } from '../hooks/useTasks';
 
 interface TaskExecutionProps {
   taskName: string;
@@ -70,15 +70,17 @@ export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecuti
     }
   };
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Tasks', href: '/admin/tasks', icon: <ListChecks size={14} /> },
+    { label: taskName, href: `/admin/tasks/${encodeURIComponent(taskName)}`, icon: <PlayCircle size={14} /> },
+    { label: `Execution ${execution.id.slice(0, 8)}` },
+  ];
+
   return (
     <Page
       title="Execution Details"
-      actions={
-        <Button variant="ghost" onClick={() => navigate(`/admin/tasks/${encodeURIComponent(taskName)}`)}>
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Task
-        </Button>
-      }
+      breadcrumbs={breadcrumbs}
+      onNavigate={navigate}
     >
       {/* Status Card */}
       <div className="mb-6">
@@ -144,13 +146,13 @@ export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecuti
             <div>
               <dt className="text-sm text-gray-500">Started</dt>
               <dd className="text-sm">
-                {execution.started_at ? formatDate(execution.started_at) : '—'}
+                {execution.started_at ? formatDateTime(execution.started_at) : '—'}
               </dd>
             </div>
             <div>
               <dt className="text-sm text-gray-500">Completed</dt>
               <dd className="text-sm">
-                {execution.completed_at ? formatDate(execution.completed_at) : '—'}
+                {execution.completed_at ? formatDateTime(execution.completed_at) : '—'}
               </dd>
             </div>
             {execution.duration_ms && (

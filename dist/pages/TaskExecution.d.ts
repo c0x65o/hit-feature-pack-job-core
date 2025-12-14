@@ -1,4 +1,3 @@
-import { type TaskExecution } from '../hooks/useTasks';
 interface TaskExecutionProps {
     taskName: string;
     executionId: string;
