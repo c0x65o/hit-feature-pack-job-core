@@ -4,13 +4,19 @@ import { useState } from 'react';
 import { PlayCircle, Clock } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatRelativeTime } from '@hit/sdk';
-import { useTasks } from '../hooks/useTasks';
+import { useTasks, useSchedules } from '../hooks/useTasks';
 export function TaskList({ onNavigate }) {
     const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
     const { tasks, loading, error, refresh } = useTasks();
+    const { schedules } = useSchedules();
     const [syncing, setSyncing] = useState(false);
     const [syncError, setSyncError] = useState(null);
     const [syncSuccess, setSyncSuccess] = useState(false);
+    // Create a map of task name to last_run time from schedules
+    const lastRunMap = new Map();
+    schedules.forEach((schedule) => {
+        lastRunMap.set(schedule.task_name, schedule.last_run);
+    });
     const navigate = (path) => {
         if (onNavigate) {
             onNavigate(path);
@@ -160,7 +166,7 @@ export function TaskList({ onNavigate }) {
                         execution_type: task.execution_type,
                         cron: task.cron,
                         enabled: task.enabled,
-                        created_at: task.created_at,
+                        last_run: lastRunMap.get(task.name) || null,
                     })), emptyMessage: "No tasks found. Tasks are synced from hit.yaml during deployment. Click 'Sync Tasks' to manually sync them now.", loading: loading, searchable: true, exportable: true, showColumnVisibility: true }) })] }));
 }
 export default TaskList;

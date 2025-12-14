@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatRelativeTime } from '@hit/sdk';
-import { useTasks, type Task } from '../hooks/useTasks';
+import { useTasks, useSchedules, type Task } from '../hooks/useTasks';
 
 interface TaskListProps {
   onNavigate?: (path: string) => void;
@@ -13,9 +13,16 @@ interface TaskListProps {
 export function TaskList({ onNavigate }: TaskListProps) {
   const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
   const { tasks, loading, error, refresh } = useTasks();
+  const { schedules } = useSchedules();
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [syncSuccess, setSyncSuccess] = useState(false);
+  
+  // Create a map of task name to last_run time from schedules
+  const lastRunMap = new Map<string, string | null>();
+  schedules.forEach((schedule) => {
+    lastRunMap.set(schedule.task_name, schedule.last_run);
+  });
 
   const navigate = (path: string) => {
     if (onNavigate) {
@@ -243,7 +250,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
             execution_type: task.execution_type,
             cron: task.cron,
             enabled: task.enabled,
-            created_at: task.created_at,
+            last_run: lastRunMap.get(task.name) || null,
           }))}
           emptyMessage="No tasks found. Tasks are synced from hit.yaml during deployment. Click 'Sync Tasks' to manually sync them now."
           loading={loading}
