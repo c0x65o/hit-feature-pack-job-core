@@ -11,6 +11,10 @@ export interface Task {
     execution_type: string;
     enabled: boolean;
     metadata: Record<string, unknown>;
+    cronjob_name?: string | null;
+    schedule_enabled?: boolean;
+    last_run?: string | null;
+    next_run?: string | null;
     created_at: string | null;
     updated_at: string | null;
 }

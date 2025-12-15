@@ -4,7 +4,7 @@ import React from 'react';
 import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatRelativeTime } from '@hit/sdk';
-import { useTasks, useSchedules, type Task } from '../hooks/useTasks';
+import { useTasks, type Task } from '../hooks/useTasks';
 
 interface TaskListProps {
   onNavigate?: (path: string) => void;
@@ -13,13 +13,9 @@ interface TaskListProps {
 export function TaskList({ onNavigate }: TaskListProps) {
   const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
   const { tasks, loading, error, refresh } = useTasks();
-  const { schedules } = useSchedules();
   
-  // Create a map of task name to last_run time from schedules
-  const lastRunMap = new Map<string, string | null>();
-  schedules.forEach((schedule) => {
-    lastRunMap.set(schedule.task_name, schedule.last_run);
-  });
+  // Tasks now include schedule info (last_run, next_run, etc.) directly
+  // No need for separate schedules endpoint
 
   const navigate = (path: string) => {
     if (onNavigate) {
@@ -146,7 +142,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
             execution_type: task.execution_type,
             cron: task.cron,
             enabled: task.enabled,
-            last_run: lastRunMap.get(task.name) || null,
+            last_run: task.last_run || null, // Schedule info now in task
           }))}
           emptyMessage="No tasks found. Tasks are automatically loaded from hit.yaml. Make sure tasks are defined in your hit.yaml file."
           loading={loading}

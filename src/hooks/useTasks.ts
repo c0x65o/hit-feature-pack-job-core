@@ -19,6 +19,11 @@ export interface Task {
   execution_type: string;
   enabled: boolean;
   metadata: Record<string, unknown>;
+  // Schedule fields (merged from TaskSchedule)
+  cronjob_name?: string | null;
+  schedule_enabled?: boolean;
+  last_run?: string | null;
+  next_run?: string | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -149,6 +154,12 @@ async function fetchTasksModule<T>(endpoint: string, options?: RequestInit): Pro
   });
 
   if (!res.ok) {
+    // Check if response is HTML (error page) instead of JSON
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('text/html')) {
+      // If it's HTML, it's likely a 404 page - throw a proper error
+      throw new TasksError(res.status, `Endpoint not found: ${endpoint}`);
+    }
     const errorBody = await res.json().catch(() => ({ detail: res.statusText }));
     const detail = errorBody.detail || errorBody.message || `Request failed: ${res.status}`;
     throw new TasksError(res.status, detail);
@@ -332,11 +343,23 @@ export function useSchedules() {
     try {
       setLoading(true);
       setError(null);
-      // Schedules come from tasks module
-      const data = await fetchTasksModule<ScheduleListResponse>('/hit/tasks/schedules');
-      setSchedules(data.schedules);
+      // Schedules come from tasks module - gracefully handle if endpoint doesn't exist
+      try {
+        const data = await fetchTasksModule<ScheduleListResponse>('/hit/tasks/schedules');
+        setSchedules(data.schedules || []);
+      } catch (err) {
+        // If schedules endpoint doesn't exist (404), that's OK - just use empty array
+        if (err instanceof TasksError && err.status === 404) {
+          setSchedules([]);
+        } else {
+          // For other errors, log but don't fail - schedules are optional
+          console.warn('Failed to fetch schedules:', err);
+          setSchedules([]);
+        }
+      }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch schedules'));
+      // Don't set error for schedules - they're optional
+      setSchedules([]);
     } finally {
       setLoading(false);
     }
