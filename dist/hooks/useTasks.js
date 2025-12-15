@@ -3,13 +3,10 @@
  * Tasks Admin API hooks
  */
 import { useState, useEffect, useCallback } from 'react';
-// Get the tasks module URL from environment or defaults
+// Get the tasks API URL - use new /api/hit/tasks endpoint that reads from hit.yaml
 function getTasksUrl() {
-    if (typeof window !== 'undefined') {
-        const win = window;
-        return win.NEXT_PUBLIC_HIT_TASKS_URL || '/api/proxy/tasks';
-    }
-    return '/api/proxy/tasks';
+    // Use the new local API route that reads tasks from hit.yaml (no sync needed)
+    return '/api/hit/tasks';
 }
 function getAuthHeaders() {
     if (typeof window === 'undefined')
@@ -32,9 +29,28 @@ class TasksError extends Error {
         this.detail = detail;
     }
 }
-async function fetchWithAuth(endpoint, options) {
-    const tasksUrl = getTasksUrl();
-    const url = `${tasksUrl}${endpoint}`;
+// For task definitions (from hit.yaml)
+async function fetchTasks(endpoint, options) {
+    const url = `${getTasksUrl()}${endpoint}`;
+    const res = await fetch(url, {
+        ...options,
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders(),
+            ...options?.headers,
+        },
+    });
+    if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({ detail: res.statusText }));
+        const detail = errorBody.detail || errorBody.message || `Request failed: ${res.status}`;
+        throw new TasksError(res.status, detail);
+    }
+    return res.json();
+}
+// For execution history/schedules (from tasks module)
+async function fetchTasksModule(endpoint, options) {
+    const url = `/api/proxy/tasks${endpoint}`;
     const res = await fetch(url, {
         ...options,
         credentials: 'include',
@@ -59,7 +75,8 @@ export function useTasks() {
         try {
             setLoading(true);
             setError(null);
-            const data = await fetchWithAuth('/hit/tasks');
+            // Task definitions come from hit.yaml via local API
+            const data = await fetchTasks('');
             setTasks(data.tasks);
         }
         catch (err) {
@@ -82,8 +99,10 @@ export function useTask(taskName) {
         try {
             setLoading(true);
             setError(null);
-            const data = await fetchWithAuth(`/hit/tasks/${encodeURIComponent(taskName)}`);
-            setTask(data);
+            // Get single task from hit.yaml via local API
+            const data = await fetchTasks('');
+            const found = data.tasks.find(t => t.name === taskName);
+            setTask(found || null);
         }
         catch (err) {
             setError(err instanceof Error ? err : new Error('Failed to fetch task'));
@@ -112,8 +131,9 @@ export function useTaskExecutions(taskName, options) {
             if (options?.offset)
                 params.append('offset', options.offset.toString());
             const query = params.toString();
+            // Execution history comes from tasks module
             const url = `/hit/tasks/${encodeURIComponent(taskName)}/executions${query ? `?${query}` : ''}`;
-            const data = await fetchWithAuth(url);
+            const data = await fetchTasksModule(url);
             setExecutions(data.executions);
             setTotal(data.total);
         }
@@ -137,7 +157,8 @@ export function useTaskExecution(taskName, executionId) {
         try {
             setLoading(true);
             setError(null);
-            const data = await fetchWithAuth(`/hit/tasks/${encodeURIComponent(taskName)}/executions/${encodeURIComponent(executionId)}`);
+            // Execution details come from tasks module
+            const data = await fetchTasksModule(`/hit/tasks/${encodeURIComponent(taskName)}/executions/${encodeURIComponent(executionId)}`);
             setExecution(data);
         }
         catch (err) {
@@ -159,7 +180,8 @@ export function useTaskMutations() {
         try {
             setLoading(true);
             setError(null);
-            const data = await fetchWithAuth(`/hit/tasks/${encodeURIComponent(taskName)}/execute`, {
+            // Execute via local API route that adds project context
+            const data = await fetchTasks(`/${encodeURIComponent(taskName)}/execute`, {
                 method: 'POST',
                 body: JSON.stringify({ triggered_by: triggeredBy }),
             });
@@ -178,7 +200,8 @@ export function useTaskMutations() {
         try {
             setLoading(true);
             setError(null);
-            const data = await fetchWithAuth(`/hit/tasks/${encodeURIComponent(taskName)}/schedule`, {
+            // Schedules are managed by tasks module
+            const data = await fetchTasksModule(`/hit/tasks/${encodeURIComponent(taskName)}/schedule`, {
                 method: 'POST',
                 body: JSON.stringify({ enabled }),
             });
@@ -203,7 +226,8 @@ export function useSchedules() {
         try {
             setLoading(true);
             setError(null);
-            const data = await fetchWithAuth('/hit/tasks/schedules');
+            // Schedules come from tasks module
+            const data = await fetchTasksModule('/hit/tasks/schedules');
             setSchedules(data.schedules);
         }
         catch (err) {
