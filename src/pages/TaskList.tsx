@@ -1,27 +1,86 @@
 'use client';
 
-import React from 'react';
-import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { PlayCircle, Clock, Play } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatRelativeTime } from '@hit/sdk';
-import { useTasks, type Task } from '../hooks/useTasks';
+import { useTasks, useTaskMutations, type Task } from '../hooks/useTasks';
 
 interface TaskListProps {
   onNavigate?: (path: string) => void;
 }
 
+// Helper to get current user email from token
+function getCurrentUserEmail(): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const token = localStorage.getItem('hit_token') || localStorage.getItem('auth_token');
+    if (!token) return null;
+    
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const payload = JSON.parse(atob(parts[1]));
+      return payload.email || payload.sub || null;
+    }
+  } catch (e) {
+    // Token parsing failed
+  }
+  
+  return null;
+}
+
+// Helper to fetch current user from /me endpoint
+async function fetchCurrentUserEmail(): Promise<string | null> {
+  try {
+    const response = await fetch('/api/proxy/auth/me', {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data.email || null;
+    }
+  } catch (e) {
+    // Fallback to token parsing
+  }
+  
+  return getCurrentUserEmail();
+}
+
 export function TaskList({ onNavigate }: TaskListProps) {
-  const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
+  const { Page, Card, Button, Badge, DataTable, Alert } = useUi();
   const { tasks, loading, error, refresh } = useTasks();
+  const { executeTask, loading: executing } = useTaskMutations();
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [executingTask, setExecutingTask] = useState<string | null>(null);
   
   // Tasks now include schedule info (last_run, next_run, etc.) directly
   // No need for separate schedules endpoint
+
+  // Get current user email on mount
+  useEffect(() => {
+    fetchCurrentUserEmail().then(setCurrentUserEmail);
+  }, []);
 
   const navigate = (path: string) => {
     if (onNavigate) {
       onNavigate(path);
     } else if (typeof window !== 'undefined') {
       window.location.href = path;
+    }
+  };
+
+  const handleExecute = async (taskName: string) => {
+    try {
+      setExecutingTask(taskName);
+      const triggeredBy = currentUserEmail || 'manual';
+      await executeTask(taskName, triggeredBy);
+      // Refresh the task list to update last_run times
+      refresh();
+    } catch (err) {
+      // Error handled by hook
+    } finally {
+      setExecutingTask(null);
     }
   };
 
@@ -122,8 +181,19 @@ export function TaskList({ onNavigate }: TaskListProps) {
               hideable: false,
               render: (_, row) => {
                 const task = row as unknown as Task;
+                const isExecuting = executingTask === task.name;
                 return (
                   <div className="flex items-center justify-end gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleExecute(task.name)}
+                      disabled={isExecuting || executing}
+                      loading={isExecuting}
+                    >
+                      <Play size={14} className="mr-1" />
+                      Run
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
