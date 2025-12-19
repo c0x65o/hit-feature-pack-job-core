@@ -4,7 +4,9 @@ import { CheckCircle, XCircle, Clock, AlertCircle, ListChecks, PlayCircle } from
 import { useUi } from '@hit/ui-kit';
 import { formatDateTime } from '@hit/sdk';
 import { useTaskExecution } from '../hooks/useTasks';
-export function TaskExecution({ taskName, executionId, onNavigate }) {
+export function TaskExecution({ name, id, onNavigate }) {
+    const taskName = name;
+    const executionId = id;
     const { Page, Card, Button, Badge, Alert, Spinner } = useUi();
     const { execution, loading, error, refresh } = useTaskExecution(taskName, executionId);
     const navigate = (path) => {

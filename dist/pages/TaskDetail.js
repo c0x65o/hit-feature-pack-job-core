@@ -42,7 +42,8 @@ async function fetchCurrentUserEmail() {
     }
     return getCurrentUserEmail();
 }
-export function TaskDetail({ taskName, onNavigate }) {
+export function TaskDetail({ name, onNavigate }) {
+    const taskName = name;
     const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
     const { task, loading: taskLoading, error: taskError, refresh: refreshTask } = useTask(taskName);
     const { executions, total, loading: executionsLoading, refresh: refreshExecutions } = useTaskExecutions(taskName, { limit: 20 });

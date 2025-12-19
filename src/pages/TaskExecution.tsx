@@ -7,12 +7,14 @@ import { formatDateTime } from '@hit/sdk';
 import { useTaskExecution, type TaskExecution as TaskExecutionType } from '../hooks/useTasks';
 
 interface TaskExecutionProps {
-  taskName: string;
-  executionId: string;
+  name: string;
+  id: string;
   onNavigate?: (path: string) => void;
 }
 
-export function TaskExecution({ taskName, executionId, onNavigate }: TaskExecutionProps) {
+export function TaskExecution({ name, id, onNavigate }: TaskExecutionProps) {
+  const taskName = name;
+  const executionId = id;
   const { Page, Card, Button, Badge, Alert, Spinner } = useUi();
   const { execution, loading, error, refresh } = useTaskExecution(taskName, executionId);
 

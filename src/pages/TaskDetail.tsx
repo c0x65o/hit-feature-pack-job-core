@@ -7,7 +7,7 @@ import { formatDateTime } from '@hit/sdk';
 import { useTask, useTaskExecutions, useTaskMutations, type Task } from '../hooks/useTasks';
 
 interface TaskDetailProps {
-  taskName: string;
+  name: string;
   onNavigate?: (path: string) => void;
 }
 
@@ -50,7 +50,8 @@ async function fetchCurrentUserEmail(): Promise<string | null> {
   return getCurrentUserEmail();
 }
 
-export function TaskDetail({ taskName, onNavigate }: TaskDetailProps) {
+export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
+  const taskName = name;
   const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
   const { task, loading: taskLoading, error: taskError, refresh: refreshTask } = useTask(taskName);
   const { executions, total, loading: executionsLoading, refresh: refreshExecutions } = useTaskExecutions(taskName, { limit: 20 });
