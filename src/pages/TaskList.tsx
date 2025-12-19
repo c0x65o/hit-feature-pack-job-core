@@ -167,7 +167,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
               render: (_, row) => getStatusBadge(row as unknown as Task),
             },
             {
-              key: 'created_at',
+              key: 'last_run',
               label: 'Last Run',
               sortable: true,
               render: (value) =>

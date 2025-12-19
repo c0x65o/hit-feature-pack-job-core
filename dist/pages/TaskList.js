@@ -115,7 +115,7 @@ export function TaskList({ onNavigate }) {
                             render: (_, row) => getStatusBadge(row),
                         },
                         {
-                            key: 'created_at',
+                            key: 'last_run',
                             label: 'Last Run',
                             sortable: true,
                             render: (value) => value ? formatRelativeTime(String(value)) : '—',
