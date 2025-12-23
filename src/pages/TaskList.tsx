@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayCircle, Clock, Play } from 'lucide-react';
+import { CirclePlay, Clock, Play } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatRelativeTime } from '@hit/sdk';
 import { useTasks, useTaskMutations, type Task } from '../hooks/useTasks';
@@ -124,17 +124,17 @@ export function TaskList({ onNavigate }: TaskListProps) {
               key: 'name',
               label: 'Name',
               sortable: true,
-              render: (_, row) => (
+              render: (_: unknown, row?: Record<string, unknown>) => (
                 <div className="flex items-center gap-2">
-                  <PlayCircle size={16} className="text-gray-500" />
-                  <span className="font-medium">{String(row.name)}</span>
+                  <CirclePlay size={16} className="text-gray-500" />
+                  <span className="font-medium">{String(row?.name)}</span>
                 </div>
               ),
             },
             {
               key: 'description',
               label: 'Description',
-              render: (value) => (
+              render: (value: unknown) => (
                 <span className="text-gray-600 dark:text-gray-400">
                   {value ? String(value) : '—'}
                 </span>
@@ -143,12 +143,12 @@ export function TaskList({ onNavigate }: TaskListProps) {
             {
               key: 'execution_type',
               label: 'Type',
-              render: (value) => getExecutionTypeBadge(String(value)),
+              render: (value: unknown) => getExecutionTypeBadge(String(value)),
             },
             {
               key: 'cron',
               label: 'Schedule',
-              render: (value) => (
+              render: (value: unknown) => (
                 <div className="flex items-center gap-2">
                   {value ? (
                     <>
@@ -164,13 +164,13 @@ export function TaskList({ onNavigate }: TaskListProps) {
             {
               key: 'enabled',
               label: 'Status',
-              render: (_, row) => getStatusBadge(row as unknown as Task),
+              render: (_: unknown, row?: Record<string, unknown>) => getStatusBadge(row as unknown as Task),
             },
             {
               key: 'last_run',
               label: 'Last Run',
               sortable: true,
-              render: (value) =>
+              render: (value: unknown) =>
                 value ? formatRelativeTime(String(value)) : '—',
             },
             {
@@ -179,7 +179,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
               align: 'right' as const,
               sortable: false,
               hideable: false,
-              render: (_, row) => {
+              render: (_: unknown, row?: Record<string, unknown>) => {
                 const task = row as unknown as Task;
                 const isExecuting = executingTask === task.name;
                 return (

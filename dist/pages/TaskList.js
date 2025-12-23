@@ -1,7 +1,7 @@
 'use client';
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useState, useEffect } from 'react';
-import { PlayCircle, Clock, Play } from 'lucide-react';
+import { CirclePlay, Clock, Play } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatRelativeTime } from '@hit/sdk';
 import { useTasks, useTaskMutations } from '../hooks/useTasks';
@@ -92,7 +92,7 @@ export function TaskList({ onNavigate }) {
                             key: 'name',
                             label: 'Name',
                             sortable: true,
-                            render: (_, row) => (_jsxs("div", { className: "flex items-center gap-2", children: [_jsx(PlayCircle, { size: 16, className: "text-gray-500" }), _jsx("span", { className: "font-medium", children: String(row.name) })] })),
+                            render: (_, row) => (_jsxs("div", { className: "flex items-center gap-2", children: [_jsx(CirclePlay, { size: 16, className: "text-gray-500" }), _jsx("span", { className: "font-medium", children: String(row?.name) })] })),
                         },
                         {
                             key: 'description',

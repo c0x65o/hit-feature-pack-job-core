@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle, Calendar, ListChecks, RefreshCw } from 'lucide-react';
+import { CirclePlay, Clock, CheckCircle, XCircle, AlertCircle, Calendar, ListChecks, RefreshCw } from 'lucide-react';
 import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
 import { formatDateTime } from '@hit/sdk';
 import { useTask, useTaskExecutions, useTaskMutations, type Task } from '../hooks/useTasks';
@@ -152,7 +152,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
             </Button>
           )}
           <Button variant="primary" onClick={handleExecute} loading={mutating}>
-            <PlayCircle size={16} className="mr-2" />
+            <CirclePlay size={16} className="mr-2" />
             Execute Now
           </Button>
           <Button variant="secondary" onClick={handleRefresh} loading={taskLoading || executionsLoading}>
@@ -245,12 +245,12 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
             {
               key: 'status',
               label: 'Status',
-              render: (value) => getStatusBadge(String(value)),
+              render: (value: unknown) => getStatusBadge(String(value)),
             },
             {
               key: 'triggered_by',
               label: 'Triggered By',
-              render: (value) => {
+              render: (value: unknown) => {
                 const triggeredBy = value ? String(value) : 'system';
                 // Show badge for cron vs manual vs user
                 if (triggeredBy === 'cron') {
@@ -265,17 +265,17 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
             {
               key: 'started_at',
               label: 'Started',
-              render: (value) => value ? formatDateTime(String(value)) : '—',
+              render: (value: unknown) => value ? formatDateTime(String(value)) : '—',
             },
             {
               key: 'completed_at',
               label: 'Completed',
-              render: (value) => value ? formatDateTime(String(value)) : '—',
+              render: (value: unknown) => value ? formatDateTime(String(value)) : '—',
             },
             {
               key: 'duration_ms',
               label: 'Duration',
-              render: (value) => {
+              render: (value: unknown) => {
                 if (!value) return '—';
                 const ms = Number(value);
                 if (ms < 1000) return `${ms}ms`;
@@ -285,7 +285,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
             {
               key: 'exit_code',
               label: 'Exit Code',
-              render: (value) => {
+              render: (value: unknown) => {
                 if (value === null || value === undefined) return '—';
                 const code = Number(value);
                 return (
@@ -299,12 +299,12 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
               key: 'actions',
               label: '',
               align: 'right' as const,
-              render: (_, row) => (
+              render: (_: unknown, row?: Record<string, unknown>) => (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    navigate(`/admin/tasks/${encodeURIComponent(taskName)}/executions/${row.id}`)
+                    navigate(`/admin/tasks/${encodeURIComponent(taskName)}/executions/${row?.id}`)
                   }
                 >
                   View

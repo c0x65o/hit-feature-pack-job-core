@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PlayCircle, Clock, CheckCircle, XCircle, AlertCircle, History, Filter } from 'lucide-react';
+import { CirclePlay, Clock, CheckCircle, XCircle, AlertCircle, History, Filter } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatDateTime, formatRelativeTime } from '@hit/sdk';
 import { useAllExecutions, type TaskExecution } from '../hooks/useTasks';
@@ -72,7 +72,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
         <div className="flex gap-2 items-center">
           <Select
             value={statusFilter}
-            onChange={(value) => setStatusFilter(value)}
+            onChange={(value: string) => setStatusFilter(value)}
             options={statusOptions}
             style={{ marginBottom: 0 }}
           />
@@ -94,7 +94,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
             {
               key: 'status',
               label: 'Status',
-              render: (value) => (
+              render: (value: unknown) => (
                 <div className="flex items-center gap-2">
                   {getStatusIcon(String(value))}
                   {getStatusBadge(String(value))}
@@ -105,7 +105,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
               key: 'task_name',
               label: 'Job Name',
               sortable: true,
-              render: (value, row) => (
+              render: (value: unknown, row?: Record<string, unknown>) => (
                 <button
                   className="font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                   onClick={() => navigate(`/admin/tasks/${encodeURIComponent(String(value))}`)}
@@ -117,7 +117,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
             {
               key: 'triggered_by',
               label: 'Triggered By',
-              render: (value) => {
+              render: (value: unknown) => {
                 const triggeredBy = value ? String(value) : 'system';
                 if (triggeredBy === 'cron') {
                   return <Badge variant="info">Cron</Badge>;
@@ -132,7 +132,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
               key: 'started_at',
               label: 'Started',
               sortable: true,
-              render: (value) => (
+              render: (value: unknown) => (
                 <div className="text-sm">
                   {value ? (
                     <>
@@ -148,12 +148,12 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
             {
               key: 'completed_at',
               label: 'Completed',
-              render: (value) => value ? formatDateTime(String(value)) : '—',
+              render: (value: unknown) => value ? formatDateTime(String(value)) : '—',
             },
             {
               key: 'duration_ms',
               label: 'Duration',
-              render: (value) => {
+              render: (value: unknown) => {
                 if (!value) return '—';
                 const ms = Number(value);
                 if (ms < 1000) return `${ms}ms`;
@@ -164,7 +164,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
             {
               key: 'exit_code',
               label: 'Exit',
-              render: (value) => {
+              render: (value: unknown) => {
                 if (value === null || value === undefined) return '—';
                 const code = Number(value);
                 return (
@@ -180,7 +180,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
               align: 'right' as const,
               sortable: false,
               hideable: false,
-              render: (_, row) => {
+              render: (_: unknown, row?: Record<string, unknown>) => {
                 const execution = row as unknown as TaskExecution;
                 return (
                   <Button

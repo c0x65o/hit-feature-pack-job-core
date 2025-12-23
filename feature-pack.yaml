@@ -23,7 +23,7 @@ routes:
 nav:
   - id: tasks
     label: Jobs
-    icon: PlayCircle
+    icon: CirclePlay
     group: system
     roles: [admin]
     showWhen: authenticated

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle, ListChecks, PlayCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle, ListChecks, CirclePlay, RefreshCw } from 'lucide-react';
 import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
 import { formatDateTime } from '@hit/sdk';
 import { useTaskExecution, type TaskExecution as TaskExecutionType } from '../hooks/useTasks';
@@ -74,7 +74,7 @@ export function TaskExecution({ name, id, onNavigate }: TaskExecutionProps) {
 
   const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Jobs', href: '/admin/tasks', icon: <ListChecks size={14} /> },
-    { label: taskName, href: `/admin/tasks/${encodeURIComponent(taskName)}`, icon: <PlayCircle size={14} /> },
+    { label: taskName, href: `/admin/tasks/${encodeURIComponent(taskName)}`, icon: <CirclePlay size={14} /> },
     { label: `Execution ${execution.id.slice(0, 8)}` },
   ];
 
