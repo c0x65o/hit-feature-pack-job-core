@@ -9,6 +9,15 @@ export type AiTraceSummary = {
   durationMs?: number | null;
   pathname?: string | null;
   user?: { userId: string; email: string; roles: string[] } | null;
+  health?: {
+    status?: 'ok' | 'auto_healed' | 'error';
+    hadErrors?: boolean;
+    non2xxCount?: number;
+    http4xxCount?: number;
+    http5xxCount?: number;
+    llmErrorCount?: number;
+    lastHttpStatus?: number | null;
+  } | null;
 };
 
 export type AiTraceDetail = Record<string, unknown>;

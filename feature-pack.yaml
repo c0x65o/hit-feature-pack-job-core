@@ -42,6 +42,13 @@ nav:
         weight: 100
         roles: [admin]
         showWhen: authenticated
+      - id: tasks-executions
+        label: Ran Jobs
+        path: /admin/tasks/executions
+        icon: History
+        weight: 110
+        roles: [admin]
+        showWhen: authenticated
 
   - id: ai
     label: AI
@@ -56,13 +63,6 @@ nav:
         path: /admin/ai/traces
         icon: Activity
         weight: 100
-        roles: [admin]
-        showWhen: authenticated
-      - id: tasks-executions
-        label: Ran Jobs
-        path: /admin/tasks/executions
-        icon: History
-        weight: 110
         roles: [admin]
         showWhen: authenticated
 

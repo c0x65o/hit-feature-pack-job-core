@@ -66,6 +66,25 @@ export function AiTraces({ onNavigate }) {
                                 return _jsxs(Badge, { variant: variant, children: [secs, "s"] });
                             },
                         },
+                        {
+                            key: 'health',
+                            label: 'Status',
+                            render: (_, row) => {
+                                const h = row?.health;
+                                const status = h?.status;
+                                const non2xx = typeof h?.non2xxCount === 'number' ? h.non2xxCount : 0;
+                                const http5xx = typeof h?.http5xxCount === 'number' ? h.http5xxCount : 0;
+                                const llmErr = typeof h?.llmErrorCount === 'number' ? h.llmErrorCount : 0;
+                                if (!status)
+                                    return _jsx("span", { className: "text-gray-500", children: "\u2014" });
+                                if (status === 'ok')
+                                    return _jsx(Badge, { variant: "success", children: "OK" });
+                                if (status === 'auto_healed') {
+                                    return (_jsxs(Badge, { variant: "warning", children: ["Auto-healed (", non2xx, " http err", non2xx === 1 ? '' : 's', ", ", http5xx, " 5xx, ", llmErr, " llm)"] }));
+                                }
+                                return (_jsxs(Badge, { variant: "error", children: ["Error (", non2xx, " http err", non2xx === 1 ? '' : 's', ", ", http5xx, " 5xx, ", llmErr, " llm)"] }));
+                            },
+                        },
                     ] }) })] }));
 }
 export default AiTraces;

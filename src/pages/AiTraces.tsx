@@ -110,6 +110,33 @@ export function AiTraces({ onNavigate }: AiTracesProps) {
                 return <Badge variant={variant as any}>{secs}s</Badge>;
               },
             },
+            {
+              key: 'health',
+              label: 'Status',
+              render: (_: unknown, row?: Record<string, unknown>) => {
+                const h = (row as any)?.health as any;
+                const status = h?.status as string | undefined;
+                const non2xx = typeof h?.non2xxCount === 'number' ? h.non2xxCount : 0;
+                const http5xx = typeof h?.http5xxCount === 'number' ? h.http5xxCount : 0;
+                const llmErr = typeof h?.llmErrorCount === 'number' ? h.llmErrorCount : 0;
+
+                if (!status) return <span className="text-gray-500">—</span>;
+
+                if (status === 'ok') return <Badge variant="success">OK</Badge>;
+                if (status === 'auto_healed') {
+                  return (
+                    <Badge variant="warning">
+                      Auto-healed ({non2xx} http err{non2xx === 1 ? '' : 's'}, {http5xx} 5xx, {llmErr} llm)
+                    </Badge>
+                  );
+                }
+                return (
+                  <Badge variant="error">
+                    Error ({non2xx} http err{non2xx === 1 ? '' : 's'}, {http5xx} 5xx, {llmErr} llm)
+                  </Badge>
+                );
+              },
+            },
           ]}
         />
       </Card>
