@@ -107,7 +107,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
               sortable: true,
               render: (value: unknown, row?: Record<string, unknown>) => (
                 <button
-                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer bg-transparent border-none p-0 m-0 outline-none focus:outline-none focus:ring-0"
                   onClick={() => navigate(`/admin/tasks/${encodeURIComponent(String(value))}`)}
                 >
                   {String(value)}
