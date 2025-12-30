@@ -12,7 +12,7 @@ interface AiTracesProps {
 
 export function AiTraces({ onNavigate }: AiTracesProps) {
   const { Page, Card, Button, DataTable, Alert, Badge } = useUi();
-  const { traces, loading, error, refresh } = useAiTraces({ limit: 100 });
+  const { traces, traceDir, retentionDays, loading, error, refresh } = useAiTraces({ limit: 100 });
 
   const navigate = (path: string) => {
     if (onNavigate) onNavigate(path);
@@ -22,7 +22,9 @@ export function AiTraces({ onNavigate }: AiTracesProps) {
   return (
     <Page
       title="AI Traces"
-      description="Admin-only per-run telemetry for the AI agent (60-day retention)"
+      description={`Admin-only per-run telemetry for the AI agent${
+        retentionDays ? ` (${retentionDays}-day retention)` : ''
+      }`}
       actions={
         <div className="flex gap-2 items-center">
           <Button variant="primary" onClick={refresh} disabled={loading}>
@@ -32,6 +34,11 @@ export function AiTraces({ onNavigate }: AiTracesProps) {
         </div>
       }
     >
+      {traceDir && (
+        <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          Trace storage: <span className="font-mono">{traceDir}</span>
+        </div>
+      )}
       {error && (
         <Alert variant="error" title="Error loading AI traces">
           {error.message}

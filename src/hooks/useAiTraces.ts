@@ -21,6 +21,12 @@ export type AiTraceSummary = {
 };
 
 export type AiTraceDetail = Record<string, unknown>;
+export type AiTracesIndexResponse = {
+  enabled?: boolean;
+  traceDir?: string;
+  retentionDays?: number;
+  traces?: AiTraceSummary[];
+};
 
 function getAuthHeaders(): Record<string, string> {
   if (typeof window === 'undefined') return {};
@@ -70,6 +76,8 @@ async function fetchAi<T>(path: string): Promise<T> {
 
 export function useAiTraces(opts: { limit?: number; offset?: number } = {}) {
   const [traces, setTraces] = useState<AiTraceSummary[]>([]);
+  const [traceDir, setTraceDir] = useState<string | null>(null);
+  const [retentionDays, setRetentionDays] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -79,10 +87,12 @@ export function useAiTraces(opts: { limit?: number; offset?: number } = {}) {
       setError(null);
       const limit = opts.limit ?? 50;
       const offset = opts.offset ?? 0;
-      const data = await fetchAi<{ traces: AiTraceSummary[] }>(
+      const data = await fetchAi<AiTracesIndexResponse>(
         `/hit/ai/traces?limit=${encodeURIComponent(String(limit))}&offset=${encodeURIComponent(String(offset))}`
       );
       setTraces(Array.isArray(data?.traces) ? data.traces : []);
+      setTraceDir(typeof data?.traceDir === 'string' ? data.traceDir : null);
+      setRetentionDays(typeof data?.retentionDays === 'number' ? data.retentionDays : null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to load AI traces'));
     } finally {
@@ -94,7 +104,7 @@ export function useAiTraces(opts: { limit?: number; offset?: number } = {}) {
     refresh();
   }, [refresh]);
 
-  return { traces, loading, error, refresh };
+  return { traces, traceDir, retentionDays, loading, error, refresh };
 }
 
 export function useAiTrace(requestId: string | null) {

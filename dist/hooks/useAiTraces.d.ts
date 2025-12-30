@@ -20,11 +20,19 @@ export type AiTraceSummary = {
     } | null;
 };
 export type AiTraceDetail = Record<string, unknown>;
+export type AiTracesIndexResponse = {
+    enabled?: boolean;
+    traceDir?: string;
+    retentionDays?: number;
+    traces?: AiTraceSummary[];
+};
 export declare function useAiTraces(opts?: {
     limit?: number;
     offset?: number;
 }): {
     traces: AiTraceSummary[];
+    traceDir: string | null;
+    retentionDays: number | null;
     loading: boolean;
     error: Error | null;
     refresh: () => Promise<void>;

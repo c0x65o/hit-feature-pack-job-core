@@ -42,6 +42,8 @@ async function fetchAi(path) {
 }
 export function useAiTraces(opts = {}) {
     const [traces, setTraces] = useState([]);
+    const [traceDir, setTraceDir] = useState(null);
+    const [retentionDays, setRetentionDays] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const refresh = useCallback(async () => {
@@ -52,6 +54,8 @@ export function useAiTraces(opts = {}) {
             const offset = opts.offset ?? 0;
             const data = await fetchAi(`/hit/ai/traces?limit=${encodeURIComponent(String(limit))}&offset=${encodeURIComponent(String(offset))}`);
             setTraces(Array.isArray(data?.traces) ? data.traces : []);
+            setTraceDir(typeof data?.traceDir === 'string' ? data.traceDir : null);
+            setRetentionDays(typeof data?.retentionDays === 'number' ? data.retentionDays : null);
         }
         catch (err) {
             setError(err instanceof Error ? err : new Error('Failed to load AI traces'));
@@ -63,7 +67,7 @@ export function useAiTraces(opts = {}) {
     useEffect(() => {
         refresh();
     }, [refresh]);
-    return { traces, loading, error, refresh };
+    return { traces, traceDir, retentionDays, loading, error, refresh };
 }
 export function useAiTrace(requestId) {
     const [trace, setTrace] = useState(null);

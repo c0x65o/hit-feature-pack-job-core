@@ -6,14 +6,14 @@ import { History, RefreshCw } from 'lucide-react';
 import { useAiTraces } from '../hooks/useAiTraces';
 export function AiTraces({ onNavigate }) {
     const { Page, Card, Button, DataTable, Alert, Badge } = useUi();
-    const { traces, loading, error, refresh } = useAiTraces({ limit: 100 });
+    const { traces, traceDir, retentionDays, loading, error, refresh } = useAiTraces({ limit: 100 });
     const navigate = (path) => {
         if (onNavigate)
             onNavigate(path);
         else if (typeof window !== 'undefined')
             window.location.href = path;
     };
-    return (_jsxs(Page, { title: "AI Traces", description: "Admin-only per-run telemetry for the AI agent (60-day retention)", actions: _jsx("div", { className: "flex gap-2 items-center", children: _jsxs(Button, { variant: "primary", onClick: refresh, disabled: loading, children: [_jsx(RefreshCw, { size: 16, className: "mr-2" }), "Refresh"] }) }), children: [error && (_jsx(Alert, { variant: "error", title: "Error loading AI traces", children: error.message })), _jsx(Card, { children: _jsx(DataTable, { loading: loading, data: traces, emptyState: {
+    return (_jsxs(Page, { title: "AI Traces", description: `Admin-only per-run telemetry for the AI agent${retentionDays ? ` (${retentionDays}-day retention)` : ''}`, actions: _jsx("div", { className: "flex gap-2 items-center", children: _jsxs(Button, { variant: "primary", onClick: refresh, disabled: loading, children: [_jsx(RefreshCw, { size: 16, className: "mr-2" }), "Refresh"] }) }), children: [traceDir && (_jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-3", children: ["Trace storage: ", _jsx("span", { className: "font-mono", children: traceDir })] })), error && (_jsx(Alert, { variant: "error", title: "Error loading AI traces", children: error.message })), _jsx(Card, { children: _jsx(DataTable, { loading: loading, data: traces, emptyState: {
                         icon: _jsx(History, { size: 48 }),
                         title: 'No traces yet',
                         description: 'Traces will appear here as the AI agent is used.',
