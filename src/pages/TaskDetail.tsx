@@ -299,6 +299,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
               key: 'actions',
               label: '',
               align: 'right' as const,
+              hideable: false,
               render: (_: unknown, row?: Record<string, unknown>) => (
                 <Button
                   variant="ghost"
