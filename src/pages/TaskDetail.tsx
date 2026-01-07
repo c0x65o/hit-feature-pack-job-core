@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { CirclePlay, Clock, CheckCircle, XCircle, AlertCircle, Calendar, ListChecks, RefreshCw } from 'lucide-react';
 import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
+import { useServerDataTableState } from '@hit/ui-kit';
 import { formatDateTime } from '@hit/sdk';
 import { useTask, useTaskExecutions, useTaskMutations, type Task } from '../hooks/useTasks';
 
@@ -54,7 +55,17 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
   const taskName = name;
   const { Page, Card, Button, Badge, DataTable, Alert, Spinner } = useUi();
   const { task, loading: taskLoading, error: taskError, refresh: refreshTask } = useTask(taskName);
-  const { executions, total, loading: executionsLoading, refresh: refreshExecutions } = useTaskExecutions(taskName, { limit: 20 });
+
+  const executionsTable = useServerDataTableState({
+    tableId: `admin.tasks.${taskName}.executions`,
+    pageSize: 20,
+    initialSort: { sortBy: 'started_at', sortOrder: 'desc' },
+  });
+
+  const { executions, total, loading: executionsLoading, refresh: refreshExecutions } = useTaskExecutions(taskName, {
+    limit: executionsTable.query.pageSize,
+    offset: (executionsTable.query.page - 1) * executionsTable.query.pageSize,
+  });
   const { executeTask, updateSchedule, loading: mutating } = useTaskMutations();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
@@ -324,6 +335,11 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
           }))}
           emptyMessage="No executions yet"
           loading={executionsLoading}
+          exportable
+          showColumnVisibility
+          total={total}
+          {...executionsTable.dataTable}
+          searchDebounceMs={400}
         />
       </Card>
     </Page>

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CirclePlay, Clock, CheckCircle, XCircle, AlertCircle, History, Filter } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
+import { useServerDataTableState } from '@hit/ui-kit';
 import { formatDateTime, formatRelativeTime } from '@hit/sdk';
 import { useAllExecutions, type TaskExecution } from '../hooks/useTasks';
 
@@ -13,9 +14,19 @@ interface AllExecutionsProps {
 export function AllExecutions({ onNavigate }: AllExecutionsProps) {
   const { Page, Card, Button, Badge, DataTable, Alert, Select } = useUi();
   const [statusFilter, setStatusFilter] = useState<string>('');
+
+  const serverTable = useServerDataTableState({
+    tableId: 'admin.tasks.executions',
+    pageSize: 50,
+    initialSort: { sortBy: 'started_at', sortOrder: 'desc' },
+    sortWhitelist: ['task_name', 'started_at'],
+  });
+
   const { executions, total, loading, error, refresh } = useAllExecutions({
-    limit: 50,
+    limit: serverTable.query.pageSize,
+    offset: (serverTable.query.page - 1) * serverTable.query.pageSize,
     status: statusFilter || undefined,
+    taskName: serverTable.query.search ? serverTable.query.search : undefined,
   });
 
   const navigate = (path: string) => {
@@ -219,6 +230,9 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
           searchable
           exportable
           showColumnVisibility
+          total={total}
+          {...serverTable.dataTable}
+          searchDebounceMs={400}
         />
         {total > 0 && (
           <div className="mt-4 text-sm text-gray-500">

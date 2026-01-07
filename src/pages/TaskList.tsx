@@ -219,6 +219,10 @@ export function TaskList({ onNavigate }: TaskListProps) {
           searchable
           exportable
           showColumnVisibility
+          tableId="admin.tasks"
+          onRefresh={refresh}
+          refreshing={loading}
+          searchDebounceMs={400}
         />
       </Card>
     </Page>
