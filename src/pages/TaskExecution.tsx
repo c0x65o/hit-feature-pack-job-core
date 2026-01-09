@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle, ListChecks, CirclePlay, RefreshCw } from 'lucide-react';
-import { useUi, useThemeTokens, type BreadcrumbItem } from '@hit/ui-kit';
+import type { BreadcrumbItem } from '@hit/ui-kit';
+import { useThemeTokens, useUi } from '@hit/ui-kit';
 import { formatDateTime } from '@hit/sdk';
 import { useTaskExecution, type TaskExecution as TaskExecutionType } from '../hooks/useTasks';
 

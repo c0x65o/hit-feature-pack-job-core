@@ -1,18 +1,20 @@
 {
   "name": "@hit/feature-pack-job-core",
-  "version": "1.0.52",
+  "version": "1.0.53",
   "description": "Core job management UI: execution history, scheduling, and admin tools. Uses @hit/ui-kit for shell-agnostic UI.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./pages/*": {
+      "development": "./src/pages/*.tsx",
       "types": "./dist/pages/*.d.ts",
       "import": "./dist/pages/*.js",
       "require": "./dist/pages/*.js",
@@ -54,5 +56,6 @@
     "dashboard",
     "ui-kit"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "sideEffects": false
 }
