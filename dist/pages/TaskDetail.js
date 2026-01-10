@@ -58,6 +58,8 @@ export function TaskDetail({ name, onNavigate }) {
     });
     const { executeTask, updateSchedule, loading: mutating } = useTaskMutations();
     const [currentUserEmail, setCurrentUserEmail] = useState(null);
+    const [parameterValues, setParameterValues] = useState({});
+    const [showExecuteModal, setShowExecuteModal] = useState(false);
     // Get current user email on mount
     useEffect(() => {
         fetchCurrentUserEmail().then(setCurrentUserEmail);
@@ -70,16 +72,47 @@ export function TaskDetail({ name, onNavigate }) {
             window.location.href = path;
         }
     };
-    const handleExecute = async () => {
+    const hasParameters = task && task.parameters && task.parameters.length > 0;
+    const handleExecuteClick = () => {
+        if (hasParameters) {
+            // Initialize parameter values with defaults
+            const defaults = {};
+            for (const param of task?.parameters || []) {
+                if (param.default) {
+                    defaults[param.name] = param.default;
+                }
+            }
+            setParameterValues(defaults);
+            setShowExecuteModal(true);
+        }
+        else {
+            doExecute({});
+        }
+    };
+    const doExecute = async (envVars) => {
         try {
             // Pass current user email as triggered_by, or 'manual' if not available
             const triggeredBy = currentUserEmail || 'manual';
-            await executeTask(taskName, triggeredBy);
+            // Filter out empty values
+            const filteredEnvVars = Object.fromEntries(Object.entries(envVars).filter(([_, v]) => v && v.trim() !== ''));
+            await executeTask(taskName, triggeredBy, Object.keys(filteredEnvVars).length > 0 ? filteredEnvVars : undefined);
+            setShowExecuteModal(false);
+            setParameterValues({});
             refreshExecutions();
         }
         catch (err) {
             // Error handled by hook
         }
+    };
+    const handleExecuteSubmit = () => {
+        // Check required parameters
+        const missingRequired = (task?.parameters || [])
+            .filter(p => p.required && !parameterValues[p.name]?.trim());
+        if (missingRequired.length > 0) {
+            // Don't submit if required params are missing
+            return;
+        }
+        doExecute(parameterValues);
     };
     const handleToggleSchedule = async (enabled) => {
         try {
@@ -118,7 +151,7 @@ export function TaskDetail({ name, onNavigate }) {
         { label: 'Jobs', href: '/admin/tasks', icon: _jsx(ListChecks, { size: 14 }) },
         { label: task.name },
     ];
-    return (_jsxs(Page, { title: task.name, description: task.description || undefined, breadcrumbs: breadcrumbs, onNavigate: navigate, actions: _jsxs("div", { className: "flex gap-2", children: [task.cron && (_jsx(Button, { variant: task.enabled ? "secondary" : "primary", onClick: () => handleToggleSchedule(!task.enabled), loading: mutating, children: task.enabled ? 'Disable Schedule' : 'Enable Schedule' })), _jsxs(Button, { variant: "primary", onClick: handleExecute, loading: mutating, children: [_jsx(CirclePlay, { size: 16, className: "mr-2" }), "Execute Now"] }), _jsxs(Button, { variant: "secondary", onClick: handleRefresh, loading: taskLoading || executionsLoading, children: [_jsx(RefreshCw, { size: 16, className: "mr-2" }), "Refresh"] })] }), children: [_jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4 mb-6", children: [_jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Job Information" }), _jsxs("dl", { className: "space-y-2", children: [_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Name" }), _jsx("dd", { className: "text-sm font-medium", children: task.name })] }), task.description && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Description" }), _jsx("dd", { className: "text-sm", children: task.description })] })), _jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Execution Type" }), _jsx("dd", { children: _jsx(Badge, { variant: task.execution_type === 'simple' ? 'info' : 'warning', children: task.execution_type }) })] }), _jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Status" }), _jsx("dd", { children: _jsx(Badge, { variant: task.enabled ? 'success' : 'default', children: task.enabled ? 'Enabled' : 'Disabled' }) })] }), task.cron && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Schedule" }), _jsx("dd", { className: "text-sm font-mono", children: task.cron })] })), task.service_name && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Service" }), _jsx("dd", { className: "text-sm", children: task.service_name })] }))] })] }), _jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Configuration" }), task.sql && (_jsxs("div", { className: "mb-4", children: [_jsx("dt", { className: "text-sm text-gray-500 mb-2", children: "SQL Query" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto", children: _jsx("code", { children: task.sql }) })] })), task.command && (_jsxs("div", { className: "mb-4", children: [_jsx("dt", { className: "text-sm text-gray-500 mb-2", children: "Command" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto", children: _jsx("code", { children: task.command }) })] })), task.script && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500 mb-2", children: "Script" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto", children: _jsx("code", { children: task.script }) })] }))] })] }), _jsxs(Card, { children: [_jsxs("h3", { className: "text-lg font-semibold mb-4", children: ["Execution History (", total, ")"] }), _jsx(DataTable, { columns: [
+    return (_jsxs(Page, { title: task.name, description: task.description || undefined, breadcrumbs: breadcrumbs, onNavigate: navigate, actions: _jsxs("div", { className: "flex gap-2", children: [task.cron && (_jsx(Button, { variant: task.enabled ? "secondary" : "primary", onClick: () => handleToggleSchedule(!task.enabled), loading: mutating, children: task.enabled ? 'Disable Schedule' : 'Enable Schedule' })), _jsxs(Button, { variant: "primary", onClick: handleExecuteClick, loading: mutating, children: [_jsx(CirclePlay, { size: 16, className: "mr-2" }), "Execute Now"] }), _jsxs(Button, { variant: "secondary", onClick: handleRefresh, loading: taskLoading || executionsLoading, children: [_jsx(RefreshCw, { size: 16, className: "mr-2" }), "Refresh"] })] }), children: [_jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4 mb-6", children: [_jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Job Information" }), _jsxs("dl", { className: "space-y-2", children: [_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Name" }), _jsx("dd", { className: "text-sm font-medium", children: task.name })] }), task.description && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Description" }), _jsx("dd", { className: "text-sm", children: task.description })] })), _jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Execution Type" }), _jsx("dd", { children: _jsx(Badge, { variant: task.execution_type === 'simple' ? 'info' : 'warning', children: task.execution_type }) })] }), _jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Status" }), _jsx("dd", { children: _jsx(Badge, { variant: task.enabled ? 'success' : 'default', children: task.enabled ? 'Enabled' : 'Disabled' }) })] }), task.cron && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Schedule" }), _jsx("dd", { className: "text-sm font-mono", children: task.cron })] })), task.service_name && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500", children: "Service" }), _jsx("dd", { className: "text-sm", children: task.service_name })] }))] })] }), _jsxs(Card, { children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Configuration" }), task.sql && (_jsxs("div", { className: "mb-4", children: [_jsx("dt", { className: "text-sm text-gray-500 mb-2", children: "SQL Query" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto", children: _jsx("code", { children: task.sql }) })] })), task.command && (_jsxs("div", { className: "mb-4", children: [_jsx("dt", { className: "text-sm text-gray-500 mb-2", children: "Command" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto", children: _jsx("code", { children: task.command }) })] })), task.script && (_jsxs("div", { children: [_jsx("dt", { className: "text-sm text-gray-500 mb-2", children: "Script" }), _jsx("pre", { className: "bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm font-mono overflow-x-auto", children: _jsx("code", { children: task.script }) })] }))] })] }), _jsxs(Card, { children: [_jsxs("h3", { className: "text-lg font-semibold mb-4", children: ["Execution History (", total, ")"] }), _jsx(DataTable, { columns: [
                             {
                                 key: 'status',
                                 label: 'Status',
@@ -188,7 +221,10 @@ export function TaskDetail({ name, onNavigate }) {
                             completed_at: ex.completed_at,
                             duration_ms: ex.duration_ms,
                             exit_code: ex.exit_code,
-                        })), emptyMessage: "No executions yet", loading: executionsLoading, exportable: true, showColumnVisibility: true, total: total, ...executionsTable.dataTable, searchDebounceMs: 400 })] })] }));
+                        })), emptyMessage: "No executions yet", loading: executionsLoading, exportable: true, showColumnVisibility: true, total: total, ...executionsTable.dataTable, searchDebounceMs: 400 })] }), showExecuteModal && hasParameters && (_jsxs("div", { className: "fixed inset-0 z-50 flex items-center justify-center", children: [_jsx("div", { className: "absolute inset-0 bg-black/50", onClick: () => setShowExecuteModal(false) }), _jsxs("div", { className: "relative bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4", children: [_jsxs("h3", { className: "text-lg font-semibold mb-4", children: ["Execute Job: ", task?.name] }), _jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-4", children: "Configure parameters for this job execution." }), _jsx("div", { className: "space-y-4", children: (task?.parameters || []).map((param) => (_jsxs("div", { children: [_jsxs("label", { className: "block text-sm font-medium mb-1", children: [param.name, param.required && _jsx("span", { className: "text-red-500 ml-1", children: "*" })] }), param.description && (_jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-1", children: param.description })), _jsx("input", { type: "text", value: parameterValues[param.name] || '', onChange: (e) => setParameterValues(prev => ({
+                                                ...prev,
+                                                [param.name]: e.target.value
+                                            })), placeholder: param.default || `Enter ${param.name}`, className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" })] }, param.name))) }), _jsxs("div", { className: "flex justify-end gap-2 mt-6", children: [_jsx(Button, { variant: "secondary", onClick: () => setShowExecuteModal(false), children: "Cancel" }), _jsxs(Button, { variant: "primary", onClick: handleExecuteSubmit, loading: mutating, disabled: (task?.parameters || []).some(p => p.required && !parameterValues[p.name]?.trim()), children: [_jsx(CirclePlay, { size: 16, className: "mr-2" }), "Execute"] })] })] })] }))] }));
 }
 export default TaskDetail;
 //# sourceMappingURL=TaskDetail.js.map

@@ -182,14 +182,17 @@ export function useTaskExecution(taskName, executionId) {
 export function useTaskMutations() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const executeTask = useCallback(async (taskName, triggeredBy) => {
+    const executeTask = useCallback(async (taskName, triggeredBy, envVars) => {
         try {
             setLoading(true);
             setError(null);
             // Execute via local API route that adds project context
             const data = await fetchTasks(`/${encodeURIComponent(taskName)}/execute`, {
                 method: 'POST',
-                body: JSON.stringify({ triggered_by: triggeredBy }),
+                body: JSON.stringify({
+                    triggered_by: triggeredBy,
+                    env_vars: envVars,
+                }),
             });
             return data;
         }

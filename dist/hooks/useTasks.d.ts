@@ -1,3 +1,10 @@
+export interface TaskParameter {
+    name: string;
+    description?: string;
+    required?: boolean;
+    type?: string;
+    default?: string;
+}
 export interface Task {
     id: string;
     project_slug: string;
@@ -11,6 +18,7 @@ export interface Task {
     execution_type: string;
     enabled: boolean;
     metadata: Record<string, unknown>;
+    parameters?: TaskParameter[];
     cronjob_name?: string | null;
     schedule_enabled?: boolean;
     last_run?: string | null;
@@ -85,7 +93,7 @@ export declare function useTaskExecution(taskName: string, executionId: string):
     refresh: () => Promise<void>;
 };
 export declare function useTaskMutations(): {
-    executeTask: (taskName: string, triggeredBy?: string) => Promise<TaskExecution>;
+    executeTask: (taskName: string, triggeredBy?: string, envVars?: Record<string, string>) => Promise<TaskExecution>;
     updateSchedule: (taskName: string, enabled: boolean) => Promise<TaskSchedule>;
     loading: boolean;
     error: Error | null;

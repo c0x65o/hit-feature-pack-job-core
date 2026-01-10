@@ -6,6 +6,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+export interface TaskParameter {
+  name: string;
+  description?: string;
+  required?: boolean;
+  type?: string;
+  default?: string;
+}
+
 export interface Task {
   id: string;
   project_slug: string;
@@ -19,6 +27,7 @@ export interface Task {
   execution_type: string;
   enabled: boolean;
   metadata: Record<string, unknown>;
+  parameters?: TaskParameter[];
   // Schedule fields (merged from TaskSchedule)
   cronjob_name?: string | null;
   schedule_enabled?: boolean;
@@ -292,7 +301,11 @@ export function useTaskMutations() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const executeTask = useCallback(async (taskName: string, triggeredBy?: string) => {
+  const executeTask = useCallback(async (
+    taskName: string, 
+    triggeredBy?: string,
+    envVars?: Record<string, string>
+  ) => {
     try {
       setLoading(true);
       setError(null);
@@ -301,7 +314,10 @@ export function useTaskMutations() {
         `/${encodeURIComponent(taskName)}/execute`,
         {
           method: 'POST',
-          body: JSON.stringify({ triggered_by: triggeredBy }),
+          body: JSON.stringify({ 
+            triggered_by: triggeredBy,
+            env_vars: envVars,
+          }),
         }
       );
       return data;

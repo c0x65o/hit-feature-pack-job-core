@@ -6,7 +6,7 @@ import type { BreadcrumbItem } from '@hit/ui-kit';
 import { useUi } from '@hit/ui-kit';
 import { useServerDataTableState } from '@hit/ui-kit/hooks/useServerDataTableState';
 import { formatDateTime } from '@hit/sdk';
-import { useTask, useTaskExecutions, useTaskMutations, type Task } from '../hooks/useTasks';
+import { useTask, useTaskExecutions, useTaskMutations, type Task, type TaskParameter } from '../hooks/useTasks';
 
 interface TaskDetailProps {
   name: string;
@@ -69,6 +69,8 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
   });
   const { executeTask, updateSchedule, loading: mutating } = useTaskMutations();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [parameterValues, setParameterValues] = useState<Record<string, string>>({});
+  const [showExecuteModal, setShowExecuteModal] = useState(false);
 
   // Get current user email on mount
   useEffect(() => {
@@ -83,15 +85,52 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
     }
   };
 
-  const handleExecute = async () => {
+  const hasParameters = task && task.parameters && task.parameters.length > 0;
+
+  const handleExecuteClick = () => {
+    if (hasParameters) {
+      // Initialize parameter values with defaults
+      const defaults: Record<string, string> = {};
+      for (const param of task?.parameters || []) {
+        if (param.default) {
+          defaults[param.name] = param.default;
+        }
+      }
+      setParameterValues(defaults);
+      setShowExecuteModal(true);
+    } else {
+      doExecute({});
+    }
+  };
+
+  const doExecute = async (envVars: Record<string, string>) => {
     try {
       // Pass current user email as triggered_by, or 'manual' if not available
       const triggeredBy = currentUserEmail || 'manual';
-      await executeTask(taskName, triggeredBy);
+      // Filter out empty values
+      const filteredEnvVars = Object.fromEntries(
+        Object.entries(envVars).filter(([_, v]) => v && v.trim() !== '')
+      );
+      await executeTask(taskName, triggeredBy, Object.keys(filteredEnvVars).length > 0 ? filteredEnvVars : undefined);
+      setShowExecuteModal(false);
+      setParameterValues({});
       refreshExecutions();
     } catch (err) {
       // Error handled by hook
     }
+  };
+
+  const handleExecuteSubmit = () => {
+    // Check required parameters
+    const missingRequired = (task?.parameters || [])
+      .filter(p => p.required && !parameterValues[p.name]?.trim());
+    
+    if (missingRequired.length > 0) {
+      // Don't submit if required params are missing
+      return;
+    }
+    
+    doExecute(parameterValues);
   };
 
   const handleToggleSchedule = async (enabled: boolean) => {
@@ -163,7 +202,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
               {task.enabled ? 'Disable Schedule' : 'Enable Schedule'}
             </Button>
           )}
-          <Button variant="primary" onClick={handleExecute} loading={mutating}>
+          <Button variant="primary" onClick={handleExecuteClick} loading={mutating}>
             <CirclePlay size={16} className="mr-2" />
             Execute Now
           </Button>
@@ -343,6 +382,64 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
           searchDebounceMs={400}
         />
       </Card>
+
+      {/* Execute with Parameters Modal */}
+      {showExecuteModal && hasParameters && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="absolute inset-0 bg-black/50" 
+            onClick={() => setShowExecuteModal(false)} 
+          />
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Execute Job: {task?.name}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Configure parameters for this job execution.
+            </p>
+            <div className="space-y-4">
+              {(task?.parameters || []).map((param) => (
+                <div key={param.name}>
+                  <label className="block text-sm font-medium mb-1">
+                    {param.name}
+                    {param.required && <span className="text-red-500 ml-1">*</span>}
+                  </label>
+                  {param.description && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {param.description}
+                    </p>
+                  )}
+                  <input
+                    type="text"
+                    value={parameterValues[param.name] || ''}
+                    onChange={(e) => setParameterValues(prev => ({
+                      ...prev,
+                      [param.name]: e.target.value
+                    }))}
+                    placeholder={param.default || `Enter ${param.name}`}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button 
+                variant="secondary" 
+                onClick={() => setShowExecuteModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="primary" 
+                onClick={handleExecuteSubmit}
+                loading={mutating}
+                disabled={(task?.parameters || []).some(p => p.required && !parameterValues[p.name]?.trim())}
+              >
+                <CirclePlay size={16} className="mr-2" />
+                Execute
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Page>
   );
 }
