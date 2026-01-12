@@ -11,22 +11,22 @@ routes:
     page: TaskList
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: tasks, verb: read }
+    authz: { entity: tasks, verb: read, require_mode: any }
   - path: /admin/tasks/executions
     page: AllExecutions
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: executions, verb: read }
+    authz: { entity: executions, verb: read, require_mode: any }
   - path: /admin/tasks/[name]
     page: TaskDetail
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: tasks, verb: read }
+    authz: { entity: tasks, verb: read, require_mode: any }
   - path: /admin/tasks/[name]/executions/[id]
     page: TaskExecution
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: executions, verb: read }
+    authz: { entity: executions, verb: read, require_mode: any }
 
 # Navigation contributions - auto-added to shell sidebar
 nav:
