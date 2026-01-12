@@ -9,16 +9,24 @@ description: "Core job management UI: execution history, schedules, and admin to
 routes:
   - path: /admin/tasks
     page: TaskList
-    roles: [admin]
+    roles: []
+    default_roles_allow: [admin]
+    authz: { entity: tasks, verb: read }
   - path: /admin/tasks/executions
     page: AllExecutions
-    roles: [admin]
+    roles: []
+    default_roles_allow: [admin]
+    authz: { entity: executions, verb: read }
   - path: /admin/tasks/[name]
     page: TaskDetail
-    roles: [admin]
+    roles: []
+    default_roles_allow: [admin]
+    authz: { entity: tasks, verb: read }
   - path: /admin/tasks/[name]/executions/[id]
     page: TaskExecution
-    roles: [admin]
+    roles: []
+    default_roles_allow: [admin]
+    authz: { entity: executions, verb: read }
 
 # Navigation contributions - auto-added to shell sidebar
 nav:
@@ -44,6 +52,131 @@ nav:
         weight: 110
         roles: [admin]
         showWhen: authenticated
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PERMISSIONS - Action definitions (for admin-core permissions UI + runtime checks)
+# ─────────────────────────────────────────────────────────────────────────────
+permissions:
+  actions:
+    # Scope Policy Tree: job-core (global) -> entity overrides.
+    #
+    # Scope modes:
+    # - none: deny all access for this verb/entity (hide pages + block APIs)
+    # - any: ignore scope (read everything)
+    # - own: only owned records (not applicable for tasks/executions - they don't have ownership fields)
+    # - ldd: owner OR matching L/D/D (not applicable for tasks/executions - they don't have LDD fields)
+    #
+    # These are mutually exclusive per node; the Security Groups UI renders them as dropdowns.
+    # Note: Tasks and executions are system-level entities without ownership or LDD fields,
+    # so `own` and `ldd` modes deny access (only `any` mode allows access).
+    - key: job-core.read.scope.none
+      label: "Job Core Read Scope = None"
+      description: "Deny all job core read access."
+      default_enabled: false
+    - key: job-core.read.scope.any
+      label: "Job Core Read Scope = Any"
+      description: "Read all job core entities regardless of scope."
+      default_enabled: false
+    - key: job-core.read.scope.own
+      label: "Job Core Read Scope = Own"
+      description: "Read only job core entities you own (not applicable for tasks/executions - they don't have ownership fields)."
+      default_enabled: false
+    - key: job-core.read.scope.ldd
+      label: "Job Core Read Scope = LDD"
+      description: "Read job core entities you own, or that match your L/D/D scope (not applicable for tasks/executions - they don't have LDD fields)."
+      default_enabled: false
+
+    - key: job-core.write.scope.none
+      label: "Job Core Write Scope = None"
+      description: "Deny all job core write access."
+      default_enabled: false
+    - key: job-core.write.scope.any
+      label: "Job Core Write Scope = Any"
+      description: "Edit job core entities regardless of scope."
+      default_enabled: false
+    - key: job-core.write.scope.own
+      label: "Job Core Write Scope = Own"
+      description: "Edit only job core entities you own (not applicable for tasks/executions - they don't have ownership fields)."
+      default_enabled: false
+    - key: job-core.write.scope.ldd
+      label: "Job Core Write Scope = LDD"
+      description: "Edit job core entities you own, or that match your L/D/D scope (not applicable for tasks/executions - they don't have LDD fields)."
+      default_enabled: false
+
+    # Tasks override (optional): if set, overrides job-core.read.scope.* for tasks only.
+    - key: job-core.tasks.read.scope.none
+      label: "Job Core Tasks Read Scope = None"
+      description: "Deny all task read access."
+      default_enabled: false
+    - key: job-core.tasks.read.scope.any
+      label: "Job Core Tasks Read Scope = Any"
+      description: "Read tasks regardless of scope."
+      default_enabled: false
+    - key: job-core.tasks.read.scope.own
+      label: "Job Core Tasks Read Scope = Own"
+      description: "Read only tasks you own (not applicable - tasks don't have ownership fields)."
+      default_enabled: false
+    - key: job-core.tasks.read.scope.ldd
+      label: "Job Core Tasks Read Scope = LDD"
+      description: "Read tasks you own, or that match your L/D/D scope (not applicable - tasks don't have LDD fields)."
+      default_enabled: false
+
+    - key: job-core.tasks.write.scope.none
+      label: "Job Core Tasks Write Scope = None"
+      description: "Deny all task write access."
+      default_enabled: false
+    - key: job-core.tasks.write.scope.any
+      label: "Job Core Tasks Write Scope = Any"
+      description: "Edit tasks regardless of scope."
+      default_enabled: false
+    - key: job-core.tasks.write.scope.own
+      label: "Job Core Tasks Write Scope = Own"
+      description: "Edit only tasks you own (not applicable - tasks don't have ownership fields)."
+      default_enabled: false
+    - key: job-core.tasks.write.scope.ldd
+      label: "Job Core Tasks Write Scope = LDD"
+      description: "Edit tasks you own, or that match your L/D/D scope (not applicable - tasks don't have LDD fields)."
+      default_enabled: false
+
+    # Executions override (optional): if set, overrides job-core.read.scope.* for executions only.
+    - key: job-core.executions.read.scope.none
+      label: "Job Core Executions Read Scope = None"
+      description: "Deny all execution read access."
+      default_enabled: false
+    - key: job-core.executions.read.scope.any
+      label: "Job Core Executions Read Scope = Any"
+      description: "Read executions regardless of scope."
+      default_enabled: false
+    - key: job-core.executions.read.scope.own
+      label: "Job Core Executions Read Scope = Own"
+      description: "Read only executions you own (not applicable - executions don't have ownership fields)."
+      default_enabled: false
+    - key: job-core.executions.read.scope.ldd
+      label: "Job Core Executions Read Scope = LDD"
+      description: "Read executions you own, or that match your L/D/D scope (not applicable - executions don't have LDD fields)."
+      default_enabled: false
+
+    - key: job-core.executions.write.scope.none
+      label: "Job Core Executions Write Scope = None"
+      description: "Deny all execution write access."
+      default_enabled: false
+    - key: job-core.executions.write.scope.any
+      label: "Job Core Executions Write Scope = Any"
+      description: "Edit executions regardless of scope."
+      default_enabled: false
+    - key: job-core.executions.write.scope.own
+      label: "Job Core Executions Write Scope = Own"
+      description: "Edit only executions you own (not applicable - executions don't have ownership fields)."
+      default_enabled: false
+    - key: job-core.executions.write.scope.ldd
+      label: "Job Core Executions Write Scope = LDD"
+      description: "Edit executions you own, or that match your L/D/D scope (not applicable - executions don't have LDD fields)."
+      default_enabled: false
+
+    - key: job-core.tasks.execute
+      label: Execute Task
+      description: "Execute a task manually (triggers task execution)."
+      default_enabled: false
 
 # Dependencies
 requires:
