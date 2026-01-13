@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { CirclePlay, Clock, CheckCircle, XCircle, AlertCircle, History, Filter } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
-import { useServerDataTableState } from '@hit/ui-kit/hooks/useServerDataTableState';
+import { useServerDataTableState, useUi } from '@hit/ui-kit';
 import { formatDateTime, formatRelativeTime } from '@hit/sdk';
 import { useAllExecutions, type TaskExecution } from '../hooks/useTasks';
 
