@@ -5,6 +5,23 @@ name: job-core
 title: System Jobs
 description: "Core job management UI: execution history, schedules, and admin tools"
 
+derived_services:
+  - name: task
+    description: Task execution worker
+    run_mode: tasks
+    command: node .hit/generated/hit_tasks_worker.cjs
+    base_services_from: tasks
+    requires_tasks: true
+    options_key: worker
+    env:
+      HIT_TASKS_BASE_SERVICE: "{{base_service}}"
+      HIT_APP_URL: "{{base_service_url}}"
+    env_from_manifest:
+      HIT_TASKS_CRON_TZ: reporting.timezone
+    required_files:
+      - .hit/generated/hit_tasks_worker.cjs
+      - .hit/generated/hit_tasks_manifest.json
+
 # Route definitions - mapped to React components
 routes:
   - path: /admin/tasks
