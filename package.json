@@ -1,6 +1,6 @@
 {
   "name": "@hit/feature-pack-job-core",
-  "version": "1.0.62",
+  "version": "1.0.63",
   "description": "Core job management UI: execution history, scheduling, and admin tools. Uses @hit/ui-kit for shell-agnostic UI.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,8 +38,11 @@
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@hit/feature-pack-auth-core": "file:../hit-feature-pack-auth-core"
+  },
   "peerDependencies": {
+    "@hit/feature-pack-auth-core": "*",
     "@hit/sdk": "*",
     "@hit/ui-kit": "*",
     "lucide-react": "^0.460.0",
