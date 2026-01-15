@@ -79,19 +79,19 @@ permissions:
     #
     # Scope modes:
     # - none: deny all access for this verb/entity (hide pages + block APIs)
-    # - any: ignore scope (read everything)
+    # - all: ignore scope (read everything)
     # - own: only owned records (not applicable for tasks/executions - they don't have ownership fields)
     # - ldd: owner OR matching L/D/D (not applicable for tasks/executions - they don't have LDD fields)
     #
     # These are mutually exclusive per node; the Security Groups UI renders them as dropdowns.
     # Note: Tasks and executions are system-level entities without ownership or LDD fields,
-    # so `own` and `ldd` modes deny access (only `any` mode allows access).
+    # so `own` and `ldd` modes deny access (only `all` mode allows access).
     - key: job-core.read.scope.none
       label: "Job Core Read Scope = None"
       description: "Deny all job core read access."
       default_enabled: false
-    - key: job-core.read.scope.any
-      label: "Job Core Read Scope = Any"
+    - key: job-core.read.scope.all
+      label: "Job Core Read Scope = All"
       description: "Read all job core entities regardless of scope."
       default_enabled: false
     - key: job-core.read.scope.own
@@ -103,8 +103,8 @@ permissions:
       label: "Job Core Write Scope = None"
       description: "Deny all job core write access."
       default_enabled: false
-    - key: job-core.write.scope.any
-      label: "Job Core Write Scope = Any"
+    - key: job-core.write.scope.all
+      label: "Job Core Write Scope = All"
       description: "Edit job core entities regardless of scope."
       default_enabled: false
     - key: job-core.write.scope.own
@@ -117,8 +117,8 @@ permissions:
       label: "Job Core Tasks Read Scope = None"
       description: "Deny all task read access."
       default_enabled: false
-    - key: job-core.tasks.read.scope.any
-      label: "Job Core Tasks Read Scope = Any"
+    - key: job-core.tasks.read.scope.all
+      label: "Job Core Tasks Read Scope = All"
       description: "Read tasks regardless of scope."
       default_enabled: false
     - key: job-core.tasks.read.scope.own
@@ -130,8 +130,8 @@ permissions:
       label: "Job Core Tasks Write Scope = None"
       description: "Deny all task write access."
       default_enabled: false
-    - key: job-core.tasks.write.scope.any
-      label: "Job Core Tasks Write Scope = Any"
+    - key: job-core.tasks.write.scope.all
+      label: "Job Core Tasks Write Scope = All"
       description: "Edit tasks regardless of scope."
       default_enabled: false
     - key: job-core.tasks.write.scope.own
@@ -144,8 +144,8 @@ permissions:
       label: "Job Core Executions Read Scope = None"
       description: "Deny all execution read access."
       default_enabled: false
-    - key: job-core.executions.read.scope.any
-      label: "Job Core Executions Read Scope = Any"
+    - key: job-core.executions.read.scope.all
+      label: "Job Core Executions Read Scope = All"
       description: "Read executions regardless of scope."
       default_enabled: false
     - key: job-core.executions.read.scope.own
@@ -157,8 +157,8 @@ permissions:
       label: "Job Core Executions Write Scope = None"
       description: "Deny all execution write access."
       default_enabled: false
-    - key: job-core.executions.write.scope.any
-      label: "Job Core Executions Write Scope = Any"
+    - key: job-core.executions.write.scope.all
+      label: "Job Core Executions Write Scope = All"
       description: "Edit executions regardless of scope."
       default_enabled: false
     - key: job-core.executions.write.scope.own
