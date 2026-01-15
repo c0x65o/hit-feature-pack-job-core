@@ -6,9 +6,9 @@ title: System Jobs
 description: "Core job management UI: execution history, schedules, and admin tools"
 
 derived_services:
-  - name: task
-    description: Task execution worker
-    run_mode: tasks
+  - name: job
+    description: Job execution worker
+    run_mode: jobs
     command: node .hit/generated/hit_tasks_worker.cjs
     base_services_from: tasks
     requires_tasks: true
