@@ -28,22 +28,22 @@ routes:
     page: TaskList
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: tasks, verb: read, require_mode: any }
+    authz: { entity: list, verb: read, require_mode: any }
   - path: /admin/jobs/executions
     page: AllExecutions
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: executions, verb: read, require_mode: any }
+    authz: { entity: results, verb: read, require_mode: any }
   - path: /admin/jobs/[name]
     page: TaskDetail
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: tasks, verb: read, require_mode: any }
+    authz: { entity: list, verb: read, require_mode: any }
   - path: /admin/jobs/[name]/executions/[id]
     page: TaskExecution
     roles: []
     default_roles_allow: [admin]
-    authz: { entity: executions, verb: read, require_mode: any }
+    authz: { entity: results, verb: read, require_mode: any }
 
 # Navigation contributions - auto-added to shell sidebar
 nav:
@@ -56,14 +56,14 @@ nav:
     weight: 900
     children:
       - id: jobs-list
-        label: Job List
+        label: List
         path: /admin/jobs
         icon: ListChecks
         weight: 100
         roles: [admin]
         showWhen: authenticated
       - id: jobs-executions
-        label: Ran Jobs
+        label: Results
         path: /admin/jobs/executions
         icon: History
         weight: 110
@@ -80,11 +80,11 @@ permissions:
     # Scope modes:
     # - none: deny all access for this verb/entity (hide pages + block APIs)
     # - all: ignore scope (read everything)
-    # - own: only owned records (not applicable for tasks/executions - they don't have ownership fields)
-    # - ldd: owner OR matching L/D/D (not applicable for tasks/executions - they don't have LDD fields)
+    # - own: only owned records (not applicable for list/results - they don't have ownership fields)
+    # - ldd: owner OR matching L/D/D (not applicable for list/results - they don't have LDD fields)
     #
     # These are mutually exclusive per node; the Security Groups UI renders them as dropdowns.
-    # Note: Tasks and executions are system-level entities without ownership or LDD fields,
+    # Note: List and results are system-level entities without ownership or LDD fields,
     # so `own` and `ldd` modes deny access (only `all` mode allows access).
     - key: job-core.read.scope.none
       label: "Job Core Read Scope = None"
@@ -112,61 +112,61 @@ permissions:
       description: "Edit only job core entities you own (not applicable for tasks/executions - they don't have ownership fields)."
       default_enabled: false
 
-    # Tasks override (optional): if set, overrides job-core.read.scope.* for tasks only.
-    - key: job-core.tasks.read.scope.none
-      label: "Job Core Tasks Read Scope = None"
-      description: "Deny all task read access."
+    # List override (optional): if set, overrides job-core.read.scope.* for list only.
+    - key: job-core.list.read.scope.none
+      label: "Job Core List Read Scope = None"
+      description: "Deny all list read access."
       default_enabled: false
-    - key: job-core.tasks.read.scope.all
-      label: "Job Core Tasks Read Scope = All"
-      description: "Read tasks regardless of scope."
+    - key: job-core.list.read.scope.all
+      label: "Job Core List Read Scope = All"
+      description: "Read list regardless of scope."
       default_enabled: false
-    - key: job-core.tasks.read.scope.own
-      label: "Job Core Tasks Read Scope = Own"
-      description: "Read only tasks you own (not applicable - tasks don't have ownership fields)."
-      default_enabled: false
-
-    - key: job-core.tasks.write.scope.none
-      label: "Job Core Tasks Write Scope = None"
-      description: "Deny all task write access."
-      default_enabled: false
-    - key: job-core.tasks.write.scope.all
-      label: "Job Core Tasks Write Scope = All"
-      description: "Edit tasks regardless of scope."
-      default_enabled: false
-    - key: job-core.tasks.write.scope.own
-      label: "Job Core Tasks Write Scope = Own"
-      description: "Edit only tasks you own (not applicable - tasks don't have ownership fields)."
+    - key: job-core.list.read.scope.own
+      label: "Job Core List Read Scope = Own"
+      description: "Read only list you own (not applicable - list don't have ownership fields)."
       default_enabled: false
 
-    # Executions override (optional): if set, overrides job-core.read.scope.* for executions only.
-    - key: job-core.executions.read.scope.none
-      label: "Job Core Executions Read Scope = None"
-      description: "Deny all execution read access."
+    - key: job-core.list.write.scope.none
+      label: "Job Core List Write Scope = None"
+      description: "Deny all list write access."
       default_enabled: false
-    - key: job-core.executions.read.scope.all
-      label: "Job Core Executions Read Scope = All"
-      description: "Read executions regardless of scope."
+    - key: job-core.list.write.scope.all
+      label: "Job Core List Write Scope = All"
+      description: "Edit list regardless of scope."
       default_enabled: false
-    - key: job-core.executions.read.scope.own
-      label: "Job Core Executions Read Scope = Own"
-      description: "Read only executions you own (not applicable - executions don't have ownership fields)."
-      default_enabled: false
-
-    - key: job-core.executions.write.scope.none
-      label: "Job Core Executions Write Scope = None"
-      description: "Deny all execution write access."
-      default_enabled: false
-    - key: job-core.executions.write.scope.all
-      label: "Job Core Executions Write Scope = All"
-      description: "Edit executions regardless of scope."
-      default_enabled: false
-    - key: job-core.executions.write.scope.own
-      label: "Job Core Executions Write Scope = Own"
-      description: "Edit only executions you own (not applicable - executions don't have ownership fields)."
+    - key: job-core.list.write.scope.own
+      label: "Job Core List Write Scope = Own"
+      description: "Edit only list you own (not applicable - list don't have ownership fields)."
       default_enabled: false
 
-    - key: job-core.tasks.execute
+    # Results override (optional): if set, overrides job-core.read.scope.* for results only.
+    - key: job-core.results.read.scope.none
+      label: "Job Core Results Read Scope = None"
+      description: "Deny all results read access."
+      default_enabled: false
+    - key: job-core.results.read.scope.all
+      label: "Job Core Results Read Scope = All"
+      description: "Read results regardless of scope."
+      default_enabled: false
+    - key: job-core.results.read.scope.own
+      label: "Job Core Results Read Scope = Own"
+      description: "Read only results you own (not applicable - results don't have ownership fields)."
+      default_enabled: false
+
+    - key: job-core.results.write.scope.none
+      label: "Job Core Results Write Scope = None"
+      description: "Deny all results write access."
+      default_enabled: false
+    - key: job-core.results.write.scope.all
+      label: "Job Core Results Write Scope = All"
+      description: "Edit results regardless of scope."
+      default_enabled: false
+    - key: job-core.results.write.scope.own
+      label: "Job Core Results Write Scope = Own"
+      description: "Edit only results you own (not applicable - results don't have ownership fields)."
+      default_enabled: false
+
+    - key: job-core.list.execute
       label: Execute Task
       description: "Execute a task manually (triggers task execution)."
       default_enabled: false
