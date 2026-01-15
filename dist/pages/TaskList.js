@@ -129,7 +129,7 @@ export function TaskList({ onNavigate }) {
                             render: (_, row) => {
                                 const task = row;
                                 const isExecuting = executingTask === task.name;
-                                return (_jsxs("div", { className: "flex items-center justify-end gap-2", children: [_jsxs(Button, { variant: "primary", size: "sm", onClick: () => handleExecute(task.name), disabled: isExecuting || executing, loading: isExecuting, children: [_jsx(Play, { size: 14, className: "mr-1" }), "Run"] }), _jsx(Button, { variant: "ghost", size: "sm", onClick: () => navigate(`/admin/tasks/${encodeURIComponent(task.name)}`), children: "View" })] }));
+                                return (_jsxs("div", { className: "flex items-center justify-end gap-2", children: [_jsxs(Button, { variant: "primary", size: "sm", onClick: () => handleExecute(task.name), disabled: isExecuting || executing, loading: isExecuting, children: [_jsx(Play, { size: 14, className: "mr-1" }), "Run"] }), _jsx(Button, { variant: "ghost", size: "sm", onClick: () => navigate(`/admin/jobs/${encodeURIComponent(task.name)}`), children: "View" })] }));
                             },
                         },
                     ], data: tasks.map((task) => ({

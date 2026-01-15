@@ -24,22 +24,22 @@ derived_services:
 
 # Route definitions - mapped to React components
 routes:
-  - path: /admin/tasks
+  - path: /admin/jobs
     page: TaskList
     roles: []
     default_roles_allow: [admin]
     authz: { entity: tasks, verb: read, require_mode: any }
-  - path: /admin/tasks/executions
+  - path: /admin/jobs/executions
     page: AllExecutions
     roles: []
     default_roles_allow: [admin]
     authz: { entity: executions, verb: read, require_mode: any }
-  - path: /admin/tasks/[name]
+  - path: /admin/jobs/[name]
     page: TaskDetail
     roles: []
     default_roles_allow: [admin]
     authz: { entity: tasks, verb: read, require_mode: any }
-  - path: /admin/tasks/[name]/executions/[id]
+  - path: /admin/jobs/[name]/executions/[id]
     page: TaskExecution
     roles: []
     default_roles_allow: [admin]
@@ -47,7 +47,7 @@ routes:
 
 # Navigation contributions - auto-added to shell sidebar
 nav:
-  - id: tasks
+  - id: jobs
     label: Jobs
     icon: CirclePlay
     group: system
@@ -55,16 +55,16 @@ nav:
     showWhen: authenticated
     weight: 900
     children:
-      - id: tasks-list
+      - id: jobs-list
         label: Job List
-        path: /admin/tasks
+        path: /admin/jobs
         icon: ListChecks
         weight: 100
         roles: [admin]
         showWhen: authenticated
-      - id: tasks-executions
+      - id: jobs-executions
         label: Ran Jobs
-        path: /admin/tasks/executions
+        path: /admin/jobs/executions
         icon: History
         weight: 110
         roles: [admin]

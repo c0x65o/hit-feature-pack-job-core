@@ -73,9 +73,9 @@ export function AllExecutions({ onNavigate }) {
                                 key: 'task_name',
                                 label: 'Job Name',
                                 sortable: true,
-                                render: (value, row) => (_jsx("span", { role: "button", tabIndex: 0, style: { cursor: 'pointer' }, className: "font-medium text-blue-600 dark:text-blue-400 hover:underline", onClick: () => navigate(`/admin/tasks/${encodeURIComponent(String(value))}`), onKeyDown: (e) => {
+                                render: (value, row) => (_jsx("span", { role: "button", tabIndex: 0, style: { cursor: 'pointer' }, className: "font-medium text-blue-600 dark:text-blue-400 hover:underline", onClick: () => navigate(`/admin/jobs/${encodeURIComponent(String(value))}`), onKeyDown: (e) => {
                                         if (e.key === 'Enter' || e.key === ' ') {
-                                            navigate(`/admin/tasks/${encodeURIComponent(String(value))}`);
+                                            navigate(`/admin/jobs/${encodeURIComponent(String(value))}`);
                                         }
                                     }, children: String(value) })),
                             },
@@ -138,7 +138,7 @@ export function AllExecutions({ onNavigate }) {
                                 hideable: false,
                                 render: (_, row) => {
                                     const execution = row;
-                                    return (_jsx(Button, { variant: "ghost", size: "sm", onClick: () => navigate(`/admin/tasks/${encodeURIComponent(execution.task_name)}/executions/${execution.id}`), children: "View" }));
+                                    return (_jsx(Button, { variant: "ghost", size: "sm", onClick: () => navigate(`/admin/jobs/${encodeURIComponent(execution.task_name)}/executions/${execution.id}`), children: "View" }));
                                 },
                             },
                         ], data: executions.map((ex) => ({

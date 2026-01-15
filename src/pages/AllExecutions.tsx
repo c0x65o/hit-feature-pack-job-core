@@ -121,10 +121,10 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
                   tabIndex={0}
                   style={{ cursor: 'pointer' }}
                   className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                  onClick={() => navigate(`/admin/tasks/${encodeURIComponent(String(value))}`)}
+                  onClick={() => navigate(`/admin/jobs/${encodeURIComponent(String(value))}`)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                      navigate(`/admin/tasks/${encodeURIComponent(String(value))}`);
+                      navigate(`/admin/jobs/${encodeURIComponent(String(value))}`);
                     }
                   }}
                 >
@@ -205,7 +205,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() =>
-                      navigate(`/admin/tasks/${encodeURIComponent(execution.task_name)}/executions/${execution.id}`)
+                      navigate(`/admin/jobs/${encodeURIComponent(execution.task_name)}/executions/${execution.id}`)
                     }
                   >
                     View

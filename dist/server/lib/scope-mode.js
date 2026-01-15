@@ -1,4 +1,4 @@
-import { checkJobCoreAction } from './require-action';
+import { resolveScopeMode } from '@hit/feature-pack-auth-core/server/lib/scope-mode';
 /**
  * Resolve effective scope mode using a tree:
  * - job-core default: job-core.{verb}.scope.{mode}
@@ -8,25 +8,16 @@ import { checkJobCoreAction } from './require-action';
  * Precedence if multiple are granted: most restrictive wins.
  */
 export async function resolveJobCoreScopeMode(request, args) {
-    const { verb, entity } = args;
-    // Try entity-specific override first (if provided)
-    if (entity) {
-        const entityPrefix = `job-core.${entity}.${verb}.scope`;
-        const modes = ['none', 'own', 'ldd', 'any'];
-        for (const m of modes) {
-            const res = await checkJobCoreAction(request, `${entityPrefix}.${m}`);
-            if (res.ok)
-                return m;
-        }
-    }
-    // Fall back to global job-core scope
-    const globalPrefix = `job-core.${verb}.scope`;
-    const modes = ['none', 'own', 'ldd', 'any'];
-    for (const m of modes) {
-        const res = await checkJobCoreAction(request, `${globalPrefix}.${m}`);
-        if (res.ok)
-            return m;
-    }
-    return 'own';
+    const m = await resolveScopeMode(request, {
+        pack: 'job-core',
+        verb: args.verb,
+        entity: args.entity,
+        supportedModes: ['none', 'all'],
+        // If nothing is configured, lock system entities down by default.
+        // Admins will still get access via auth-core template defaults in action evaluation.
+        fallbackMode: 'none',
+        logPrefix: 'Job-Core',
+    });
+    return (m === 'all' ? 'all' : 'none');
 }
 //# sourceMappingURL=scope-mode.js.map

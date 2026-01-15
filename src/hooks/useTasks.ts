@@ -100,7 +100,7 @@ interface AllExecutionsOptions extends UseQueryOptions {
 // Get the tasks API URL - use proxy route to tasks module
 function getTasksUrl(): string {
   // Use proxy route to tasks module which reads from hit.yaml config
-  return '/api/proxy/tasks/hit/tasks';
+  return '/api/proxy/jobs/hit/tasks';
 }
 
 function getAuthHeaders(): Record<string, string> {
@@ -155,7 +155,7 @@ async function fetchTasks<T>(endpoint: string, options?: RequestInit): Promise<T
 
 // For execution history/schedules (from tasks module)
 async function fetchTasksModule<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const url = `/api/proxy/tasks${endpoint}`;
+  const url = `/api/proxy/jobs${endpoint}`;
   
   const res = await fetch(url, {
     ...options,

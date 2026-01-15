@@ -1,7 +1,8 @@
-import type { NextRequest } from 'next/server';
-import { checkJobCoreAction } from './require-action';
+import { resolveScopeMode, type ScopeMode as CoreScopeMode } from '@hit/feature-pack-auth-core/server/lib/scope-mode';
 
-export type ScopeMode = 'none' | 'own' | 'ldd' | 'any';
+// Job-core entities are system-level (no ownership or LDD fields).
+// We intentionally only support: none | all.
+export type ScopeMode = 'none' | 'all';
 export type ScopeVerb = 'read' | 'write' | 'delete';
 export type ScopeEntity = 'tasks' | 'executions';
 
@@ -14,30 +15,18 @@ export type ScopeEntity = 'tasks' | 'executions';
  * Precedence if multiple are granted: most restrictive wins.
  */
 export async function resolveJobCoreScopeMode(
-  request: NextRequest,
+  request: Request,
   args: { verb: ScopeVerb; entity?: ScopeEntity }
 ): Promise<ScopeMode> {
-  const { verb, entity } = args;
-  
-  // Try entity-specific override first (if provided)
-  if (entity) {
-    const entityPrefix = `job-core.${entity}.${verb}.scope`;
-    const modes: ScopeMode[] = ['none', 'own', 'ldd', 'any'];
-    
-    for (const m of modes) {
-      const res = await checkJobCoreAction(request, `${entityPrefix}.${m}`);
-      if (res.ok) return m;
-    }
-  }
-  
-  // Fall back to global job-core scope
-  const globalPrefix = `job-core.${verb}.scope`;
-  const modes: ScopeMode[] = ['none', 'own', 'ldd', 'any'];
-
-  for (const m of modes) {
-    const res = await checkJobCoreAction(request, `${globalPrefix}.${m}`);
-    if (res.ok) return m;
-  }
-
-  return 'own';
+  const m = await resolveScopeMode(request as Parameters<typeof resolveScopeMode>[0], {
+    pack: 'job-core',
+    verb: args.verb,
+    entity: args.entity,
+    supportedModes: ['none', 'all'] satisfies CoreScopeMode[],
+    // If nothing is configured, lock system entities down by default.
+    // Admins will still get access via auth-core template defaults in action evaluation.
+    fallbackMode: 'none',
+    logPrefix: 'Job-Core',
+  });
+  return (m === 'all' ? 'all' : 'none') as ScopeMode;
 }

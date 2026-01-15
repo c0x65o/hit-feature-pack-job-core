@@ -197,7 +197,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => navigate(`/admin/tasks/${encodeURIComponent(task.name)}`)}
+                      onClick={() => navigate(`/admin/jobs/${encodeURIComponent(task.name)}`)}
                     >
                       View
                     </Button>

@@ -181,7 +181,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
   };
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Jobs', href: '/admin/tasks', icon: <ListChecks size={14} /> },
+    { label: 'Jobs', href: '/admin/jobs', icon: <ListChecks size={14} /> },
     { label: task.name },
   ];
 
@@ -356,7 +356,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    navigate(`/admin/tasks/${encodeURIComponent(taskName)}/executions/${row?.id}`)
+                    navigate(`/admin/jobs/${encodeURIComponent(taskName)}/executions/${row?.id}`)
                   }
                 >
                   View

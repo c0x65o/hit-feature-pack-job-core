@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 // Get the tasks API URL - use proxy route to tasks module
 function getTasksUrl() {
     // Use proxy route to tasks module which reads from hit.yaml config
-    return '/api/proxy/tasks/hit/tasks';
+    return '/api/proxy/jobs/hit/tasks';
 }
 function getAuthHeaders() {
     if (typeof window === 'undefined')
@@ -50,7 +50,7 @@ async function fetchTasks(endpoint, options) {
 }
 // For execution history/schedules (from tasks module)
 async function fetchTasksModule(endpoint, options) {
-    const url = `/api/proxy/tasks${endpoint}`;
+    const url = `/api/proxy/jobs${endpoint}`;
     const res = await fetch(url, {
         ...options,
         credentials: 'include',
