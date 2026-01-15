@@ -50,7 +50,7 @@ async function fetchCurrentUserEmail(): Promise<string | null> {
 export function TaskList({ onNavigate }: TaskListProps) {
   const { Page, Card, Button, Badge, DataTable, Alert } = useUi();
   const { tasks, loading, error, refresh } = useTasks();
-  const { executeTask, loading: executing } = useTaskMutations();
+  const { executeTask, loading: executing, error: mutationError } = useTaskMutations();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [executingTask, setExecutingTask] = useState<string | null>(null);
   
@@ -114,6 +114,11 @@ export function TaskList({ onNavigate }: TaskListProps) {
       {error && (
         <Alert variant="error" title="Error loading jobs">
           {error.message}
+        </Alert>
+      )}
+      {mutationError && (
+        <Alert variant="error" title="Error running job">
+          {mutationError.message}
         </Alert>
       )}
 

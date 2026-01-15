@@ -43,7 +43,7 @@ async function fetchCurrentUserEmail() {
 export function TaskList({ onNavigate }) {
     const { Page, Card, Button, Badge, DataTable, Alert } = useUi();
     const { tasks, loading, error, refresh } = useTasks();
-    const { executeTask, loading: executing } = useTaskMutations();
+    const { executeTask, loading: executing, error: mutationError } = useTaskMutations();
     const [currentUserEmail, setCurrentUserEmail] = useState(null);
     const [executingTask, setExecutingTask] = useState(null);
     // Tasks now include schedule info (last_run, next_run, etc.) directly
@@ -87,7 +87,7 @@ export function TaskList({ onNavigate }) {
         }
         return _jsx(Badge, { variant: "warning", children: "Complex" });
     };
-    return (_jsxs(Page, { title: "Jobs", description: "Manage and monitor job executions", actions: _jsx("div", { className: "flex gap-2", children: _jsx(Button, { variant: "primary", onClick: refresh, children: "Refresh" }) }), children: [error && (_jsx(Alert, { variant: "error", title: "Error loading jobs", children: error.message })), _jsx(Card, { children: _jsx(DataTable, { columns: [
+    return (_jsxs(Page, { title: "Jobs", description: "Manage and monitor job executions", actions: _jsx("div", { className: "flex gap-2", children: _jsx(Button, { variant: "primary", onClick: refresh, children: "Refresh" }) }), children: [error && (_jsx(Alert, { variant: "error", title: "Error loading jobs", children: error.message })), mutationError && (_jsx(Alert, { variant: "error", title: "Error running job", children: mutationError.message })), _jsx(Card, { children: _jsx(DataTable, { columns: [
                         {
                             key: 'name',
                             label: 'Name',
