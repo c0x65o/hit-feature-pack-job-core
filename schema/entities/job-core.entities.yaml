@@ -1,0 +1,42 @@
+entities:
+  # Minimal schema-driven entity declarations for pack readiness checks.
+  #
+  # These entities are intentionally lightweight: they exist to declare `api.resource`
+  # and required security/authz blocks so the pack can be validated consistently.
+
+  job-core.task:
+    api:
+      resource: tasks
+    security:
+      list: { authz: { entity: tasks, verb: read } }
+      detail: { authz: { entity: tasks, verb: read } }
+      new: { authz: { entity: tasks, verb: write } }
+      edit: { authz: { entity: tasks, verb: write } }
+    fields:
+      id: { type: text, label: ID }
+      name: { type: text, label: Name }
+      description: { type: text, label: Description }
+      cron: { type: text, label: Schedule }
+      execution_type: { type: text, label: Execution Type }
+      enabled: { type: boolean, label: Enabled }
+      last_run: { type: datetime, label: Last Run }
+      next_run: { type: datetime, label: Next Run }
+
+  job-core.execution:
+    api:
+      resource: executions
+    security:
+      list: { authz: { entity: executions, verb: read } }
+      detail: { authz: { entity: executions, verb: read } }
+      new: { authz: { entity: executions, verb: write } }
+      edit: { authz: { entity: executions, verb: write } }
+    fields:
+      id: { type: text, label: ID }
+      task_name: { type: text, label: Job Name }
+      status: { type: text, label: Status }
+      triggered_by: { type: text, label: Triggered By }
+      started_at: { type: datetime, label: Started }
+      completed_at: { type: datetime, label: Completed }
+      duration_ms: { type: number, label: Duration (ms) }
+      exit_code: { type: number, label: Exit Code }
+

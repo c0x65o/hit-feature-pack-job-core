@@ -7,7 +7,7 @@
  * When used with the route loader system, only the requested component is bundled.
  */
 // Pages - exported individually for tree-shaking
-export { TaskList, TaskListPage, TaskDetail, TaskDetailPage, TaskExecution, TaskExecutionPage, } from './pages/index';
+export { TaskList, TaskListPage, TaskDetail, TaskDetailPage, TaskExecution, TaskExecutionPage, AllExecutions, AllExecutionsPage, } from './pack-pages/index';
 // Hooks
 export * from './hooks/useTasks';
 //# sourceMappingURL=index.js.map

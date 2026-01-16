@@ -15,7 +15,9 @@ export {
   TaskDetailPage,
   TaskExecution,
   TaskExecutionPage,
-} from './pages/index';
+  AllExecutions,
+  AllExecutionsPage,
+} from './pack-pages/index';
 
 // Hooks
 export * from './hooks/useTasks';

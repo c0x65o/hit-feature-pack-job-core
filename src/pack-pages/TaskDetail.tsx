@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { CirclePlay, Clock, CheckCircle, XCircle, AlertCircle, Calendar, ListChecks, RefreshCw } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { CirclePlay, ListChecks, RefreshCw } from 'lucide-react';
 import type { BreadcrumbItem } from '@hit/ui-kit';
-import { useUi } from '@hit/ui-kit';
-import { useServerDataTableState } from '@hit/ui-kit';
+import { useServerDataTableState, useUi } from '@hit/ui-kit';
 import { formatDateTime } from '@hit/sdk';
-import { useTask, useTaskExecutions, useTaskMutations, type Task, type TaskParameter } from '../hooks/useTasks';
+import { useTask, useTaskExecutions, useTaskMutations, type Task } from '../hooks/useTasks';
 
 interface TaskDetailProps {
   name: string;
@@ -16,12 +15,12 @@ interface TaskDetailProps {
 // Helper to get current user email from token
 function getCurrentUserEmail(): string | null {
   if (typeof window === 'undefined') return null;
-  
+
   try {
     // Try to get token from localStorage
     const token = localStorage.getItem('hit_token') || localStorage.getItem('auth_token');
     if (!token) return null;
-    
+
     // Decode JWT token to get email
     const parts = token.split('.');
     if (parts.length === 3) {
@@ -31,7 +30,7 @@ function getCurrentUserEmail(): string | null {
   } catch (e) {
     // Token parsing failed, try fetching from /me endpoint
   }
-  
+
   return null;
 }
 
@@ -48,7 +47,7 @@ async function fetchCurrentUserEmail(): Promise<string | null> {
   } catch (e) {
     // Fallback to token parsing
   }
-  
+
   return getCurrentUserEmail();
 }
 
@@ -63,10 +62,12 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
     initialSort: { sortBy: 'started_at', sortOrder: 'desc' },
   });
 
-  const { executions, total, loading: executionsLoading, refresh: refreshExecutions } = useTaskExecutions(taskName, {
-    limit: executionsTable.query.pageSize,
-    offset: (executionsTable.query.page - 1) * executionsTable.query.pageSize,
-  });
+  const { executions, total, loading: executionsLoading, refresh: refreshExecutions } =
+    useTaskExecutions(taskName, {
+      limit: executionsTable.query.pageSize,
+      offset: (executionsTable.query.page - 1) * executionsTable.query.pageSize,
+    });
+
   const { executeTask, updateSchedule, loading: mutating } = useTaskMutations();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({});
@@ -85,7 +86,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
     }
   };
 
-  const hasParameters = task && task.parameters && task.parameters.length > 0;
+  const hasParameters = Boolean(task && task.parameters && task.parameters.length > 0);
 
   const handleExecuteClick = () => {
     if (hasParameters) {
@@ -111,7 +112,11 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
       const filteredEnvVars = Object.fromEntries(
         Object.entries(envVars).filter(([_, v]) => v && v.trim() !== '')
       );
-      await executeTask(taskName, triggeredBy, Object.keys(filteredEnvVars).length > 0 ? filteredEnvVars : undefined);
+      await executeTask(
+        taskName,
+        triggeredBy,
+        Object.keys(filteredEnvVars).length > 0 ? filteredEnvVars : undefined
+      );
       setShowExecuteModal(false);
       setParameterValues({});
       refreshExecutions();
@@ -122,14 +127,15 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
 
   const handleExecuteSubmit = () => {
     // Check required parameters
-    const missingRequired = (task?.parameters || [])
-      .filter(p => p.required && !parameterValues[p.name]?.trim());
-    
+    const missingRequired = (task?.parameters || []).filter(
+      (p) => p.required && !parameterValues[p.name]?.trim()
+    );
+
     if (missingRequired.length > 0) {
       // Don't submit if required params are missing
       return;
     }
-    
+
     doExecute(parameterValues);
   };
 
@@ -195,7 +201,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
         <div className="flex gap-2">
           {task.cron && (
             <Button
-              variant={task.enabled ? "secondary" : "primary"}
+              variant={task.enabled ? 'secondary' : 'primary'}
               onClick={() => handleToggleSchedule(!task.enabled)}
               loading={mutating}
             >
@@ -206,7 +212,11 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
             <CirclePlay size={16} className="mr-2" />
             Execute Now
           </Button>
-          <Button variant="secondary" onClick={handleRefresh} loading={taskLoading || executionsLoading}>
+          <Button
+            variant="secondary"
+            onClick={handleRefresh}
+            loading={taskLoading || executionsLoading}
+          >
             <RefreshCw size={16} className="mr-2" />
             Refresh
           </Button>
@@ -316,12 +326,12 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
             {
               key: 'started_at',
               label: 'Started',
-              render: (value: unknown) => value ? formatDateTime(String(value)) : '—',
+              render: (value: unknown) => (value ? formatDateTime(String(value)) : '—'),
             },
             {
               key: 'completed_at',
               label: 'Completed',
-              render: (value: unknown) => value ? formatDateTime(String(value)) : '—',
+              render: (value: unknown) => (value ? formatDateTime(String(value)) : '—'),
             },
             {
               key: 'duration_ms',
@@ -339,11 +349,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
               render: (value: unknown) => {
                 if (value === null || value === undefined) return '—';
                 const code = Number(value);
-                return (
-                  <span className={code === 0 ? 'text-green-600' : 'text-red-600'}>
-                    {code}
-                  </span>
-                );
+                return <span className={code === 0 ? 'text-green-600' : 'text-red-600'}>{code}</span>;
               },
             },
             {
@@ -355,9 +361,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() =>
-                    navigate(`/admin/jobs/${encodeURIComponent(taskName)}/executions/${row?.id}`)
-                  }
+                  onClick={() => navigate(`/admin/jobs/${encodeURIComponent(taskName)}/executions/${row?.id}`)}
                 >
                   View
                 </Button>
@@ -386,10 +390,7 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
       {/* Execute with Parameters Modal */}
       {showExecuteModal && hasParameters && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div 
-            className="absolute inset-0 bg-black/50" 
-            onClick={() => setShowExecuteModal(false)} 
-          />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowExecuteModal(false)} />
           <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold mb-4">Execute Job: {task?.name}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -403,17 +404,17 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
                     {param.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
                   {param.description && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {param.description}
-                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{param.description}</p>
                   )}
                   <input
                     type="text"
                     value={parameterValues[param.name] || ''}
-                    onChange={(e) => setParameterValues(prev => ({
-                      ...prev,
-                      [param.name]: e.target.value
-                    }))}
+                    onChange={(e) =>
+                      setParameterValues((prev) => ({
+                        ...prev,
+                        [param.name]: e.target.value,
+                      }))
+                    }
                     placeholder={param.default || `Enter ${param.name}`}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -421,17 +422,16 @@ export function TaskDetail({ name, onNavigate }: TaskDetailProps) {
               ))}
             </div>
             <div className="flex justify-end gap-2 mt-6">
-              <Button 
-                variant="secondary" 
-                onClick={() => setShowExecuteModal(false)}
-              >
+              <Button variant="secondary" onClick={() => setShowExecuteModal(false)}>
                 Cancel
               </Button>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={handleExecuteSubmit}
                 loading={mutating}
-                disabled={(task?.parameters || []).some(p => p.required && !parameterValues[p.name]?.trim())}
+                disabled={(task?.parameters || []).some(
+                  (p) => p.required && !parameterValues[p.name]?.trim()
+                )}
               >
                 <CirclePlay size={16} className="mr-2" />
                 Execute

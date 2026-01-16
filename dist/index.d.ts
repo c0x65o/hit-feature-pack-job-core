@@ -6,6 +6,6 @@
  * Components are exported individually for optimal tree-shaking.
  * When used with the route loader system, only the requested component is bundled.
  */
-export { TaskList, TaskListPage, TaskDetail, TaskDetailPage, TaskExecution, TaskExecutionPage, } from './pages/index';
+export { TaskList, TaskListPage, TaskDetail, TaskDetailPage, TaskExecution, TaskExecutionPage, AllExecutions, AllExecutionsPage, } from './pack-pages/index';
 export * from './hooks/useTasks';
 //# sourceMappingURL=index.d.ts.map

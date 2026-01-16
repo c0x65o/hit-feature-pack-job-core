@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CirclePlay, Clock, CheckCircle, XCircle, AlertCircle, History, Filter } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useServerDataTableState, useUi } from '@hit/ui-kit';
 import { formatDateTime, formatRelativeTime } from '@hit/sdk';
 import { useAllExecutions, type TaskExecution } from '../hooks/useTasks';
@@ -115,7 +115,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
               key: 'task_name',
               label: 'Job Name',
               sortable: true,
-              render: (value: unknown, row?: Record<string, unknown>) => (
+              render: (value: unknown) => (
                 <span
                   role="button"
                   tabIndex={0}
@@ -166,7 +166,7 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
             {
               key: 'completed_at',
               label: 'Completed',
-              render: (value: unknown) => value ? formatDateTime(String(value)) : '—',
+              render: (value: unknown) => (value ? formatDateTime(String(value)) : '—'),
             },
             {
               key: 'duration_ms',
@@ -205,7 +205,9 @@ export function AllExecutions({ onNavigate }: AllExecutionsProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() =>
-                      navigate(`/admin/jobs/${encodeURIComponent(execution.task_name)}/executions/${execution.id}`)
+                      navigate(
+                        `/admin/jobs/${encodeURIComponent(execution.task_name)}/executions/${execution.id}`
+                      )
                     }
                   >
                     View

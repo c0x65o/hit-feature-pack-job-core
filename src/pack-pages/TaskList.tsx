@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CirclePlay, Clock, Play } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { formatRelativeTime } from '@hit/sdk';
-import { useTasks, useTaskMutations, type Task } from '../hooks/useTasks';
+import { useTaskMutations, useTasks, type Task } from '../hooks/useTasks';
 
 interface TaskListProps {
   onNavigate?: (path: string) => void;
@@ -13,11 +13,11 @@ interface TaskListProps {
 // Helper to get current user email from token
 function getCurrentUserEmail(): string | null {
   if (typeof window === 'undefined') return null;
-  
+
   try {
     const token = localStorage.getItem('hit_token') || localStorage.getItem('auth_token');
     if (!token) return null;
-    
+
     const parts = token.split('.');
     if (parts.length === 3) {
       const payload = JSON.parse(atob(parts[1]));
@@ -26,7 +26,7 @@ function getCurrentUserEmail(): string | null {
   } catch (e) {
     // Token parsing failed
   }
-  
+
   return null;
 }
 
@@ -43,7 +43,7 @@ async function fetchCurrentUserEmail(): Promise<string | null> {
   } catch (e) {
     // Fallback to token parsing
   }
-  
+
   return getCurrentUserEmail();
 }
 
@@ -53,7 +53,7 @@ export function TaskList({ onNavigate }: TaskListProps) {
   const { executeTask, loading: executing, error: mutationError } = useTaskMutations();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [executingTask, setExecutingTask] = useState<string | null>(null);
-  
+
   // Tasks now include schedule info (last_run, next_run, etc.) directly
   // No need for separate schedules endpoint
 
@@ -83,7 +83,6 @@ export function TaskList({ onNavigate }: TaskListProps) {
       setExecutingTask(null);
     }
   };
-
 
   const getStatusBadge = (task: Task) => {
     if (!task.enabled) {
@@ -169,14 +168,14 @@ export function TaskList({ onNavigate }: TaskListProps) {
             {
               key: 'enabled',
               label: 'Status',
-              render: (_: unknown, row?: Record<string, unknown>) => getStatusBadge(row as unknown as Task),
+              render: (_: unknown, row?: Record<string, unknown>) =>
+                getStatusBadge(row as unknown as Task),
             },
             {
               key: 'last_run',
               label: 'Last Run',
               sortable: true,
-              render: (value: unknown) =>
-                value ? formatRelativeTime(String(value)) : '—',
+              render: (value: unknown) => (value ? formatRelativeTime(String(value)) : '—'),
             },
             {
               key: 'actions',
