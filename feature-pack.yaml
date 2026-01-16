@@ -25,22 +25,26 @@ derived_services:
 # Route definitions - mapped to React components
 routes:
   - path: /admin/jobs
-    page: TaskList
+    page: EntityList
+    params: { entityKey: job-core.task }
     roles: []
     default_roles_allow: [admin]
     authz: { entity: list, verb: read, require_mode: any }
   - path: /admin/jobs/executions
-    page: AllExecutions
+    page: EntityList
+    params: { entityKey: job-core.execution }
     roles: []
     default_roles_allow: [admin]
     authz: { entity: results, verb: read, require_mode: any }
   - path: /admin/jobs/[name]
-    page: TaskDetail
+    page: EntityDetail
+    params: { entityKey: job-core.task }
     roles: []
     default_roles_allow: [admin]
     authz: { entity: list, verb: read, require_mode: any }
   - path: /admin/jobs/[name]/executions/[id]
-    page: TaskExecution
+    page: EntityDetail
+    params: { entityKey: job-core.execution }
     roles: []
     default_roles_allow: [admin]
     authz: { entity: results, verb: read, require_mode: any }

@@ -12,6 +12,17 @@ entities:
       detail: { authz: { entity: tasks, verb: read } }
       new: { authz: { entity: tasks, verb: write } }
       edit: { authz: { entity: tasks, verb: write } }
+    meta:
+      titleSingular: Job
+      titlePlural: Jobs
+      descriptionPlural: Manage and run system jobs
+      actions:
+        allowCreate: false
+    list:
+      widget: jobTaskList
+      allowCreate: false
+    detail:
+      widget: jobTaskDetail
     fields:
       id: { type: text, label: ID }
       name: { type: text, label: Name }
@@ -30,6 +41,17 @@ entities:
       detail: { authz: { entity: executions, verb: read } }
       new: { authz: { entity: executions, verb: write } }
       edit: { authz: { entity: executions, verb: write } }
+    meta:
+      titleSingular: Execution
+      titlePlural: Executions
+      descriptionPlural: Job execution history
+      actions:
+        allowCreate: false
+    list:
+      widget: jobAllExecutionsList
+      allowCreate: false
+    detail:
+      widget: jobTaskExecutionDetail
     fields:
       id: { type: text, label: ID }
       task_name: { type: text, label: Job Name }
