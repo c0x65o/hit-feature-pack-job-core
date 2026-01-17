@@ -13,6 +13,25 @@ import { getDb } from '@/lib/db';
 import { hitTaskExecutions } from '@/lib/feature-pack-schemas';
 import { requireJobCoreEntityAuthz } from '../lib/authz';
 
+function toExecutionRow(row: any) {
+  if (!row || typeof row !== 'object') return row;
+  const item: any = row;
+  return {
+    id: item.id ?? null,
+    task_name: item.taskName ?? item.task_name ?? null,
+    service_name: item.serviceName ?? item.service_name ?? null,
+    triggered_by: item.triggeredBy ?? item.triggered_by ?? null,
+    status: item.status ?? null,
+    enqueued_at: item.enqueuedAt ?? item.enqueued_at ?? null,
+    started_at: item.startedAt ?? item.started_at ?? null,
+    completed_at: item.completedAt ?? item.completed_at ?? null,
+    exit_code: item.exitCode ?? item.exit_code ?? null,
+    duration_ms: item.durationMs ?? item.duration_ms ?? null,
+    error: item.error ?? null,
+    logs: item.logs ?? '',
+  };
+}
+
 function parseListParams(request: NextRequest) {
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get('page') || 1) || 1);
@@ -74,7 +93,7 @@ export async function GET(request: NextRequest) {
       .offset((page - 1) * pageSize);
 
     return NextResponse.json({
-      items: items || [],
+      items: (items || []).map(toExecutionRow),
       pagination: { page, pageSize, total },
     });
   } catch (error: any) {

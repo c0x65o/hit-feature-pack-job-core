@@ -10,6 +10,6 @@ type RouteParams = {
         id: string;
     }>;
 };
-export declare function POST(request: NextRequest, { params }: RouteParams): Promise<Response>;
+export declare function POST(request: NextRequest, { params }: RouteParams): Promise<any>;
 export {};
 //# sourceMappingURL=tasks-id-run.d.ts.map

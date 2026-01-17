@@ -49,8 +49,10 @@ entities:
         - name
         - description
         - cron
+        - service_name
         - enabled
         - last_run
+        - command
       rowActions:
         - kind: action
           label: Run
@@ -120,6 +122,8 @@ entities:
         - status
         - triggered_by
         - enqueued_at
+        - started_at
+        - completed_at
         - duration_ms
         - exit_code
     detail:

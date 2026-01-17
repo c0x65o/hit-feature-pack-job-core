@@ -1,0 +1,16 @@
+version: 1
+
+# Pack-owned "special" API routes (schema-visible).
+#
+# These are endpoints that are NOT the schema-generated CRUD routes derived from `entities.*.api.resource`.
+# They must be explicitly declared here so `hit schema validate` can enforce consistency and prevent drift.
+api:
+  routes:
+    - path: /api/job-core/tasks/[id]/run
+      methods: [POST]
+      handler: tasks-id-run
+      description: "Enqueue a task execution row (DB-first); tasks worker will execute it"
+    - path: /api/job-core/tasks/[id]/schedule
+      methods: [PUT]
+      handler: tasks-id-schedule
+      description: "Enable/disable cron schedule for a task (DB-first)"
