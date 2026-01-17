@@ -57,6 +57,7 @@ entities:
         enabled: false
         last_run: true
         command: false
+        actions: true
       columns:
         - name
         - description
