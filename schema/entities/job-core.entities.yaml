@@ -157,7 +157,22 @@ entities:
     fields:
       id: { type: text, label: ID }
       task_name: { type: text, label: Job Name }
-      status: { type: text, label: Status }
+      status:
+        type: text
+        label: Status
+        options:
+          - value: queued
+            label: Queued
+            color: warning
+          - value: running
+            label: Running
+            color: info
+          - value: success
+            label: Success
+            color: success
+          - value: failed
+            label: Failed
+            color: error
       triggered_by: { type: text, label: Triggered By }
       enqueued_at: { type: datetime, label: Enqueued }
       started_at: { type: datetime, label: Started }
