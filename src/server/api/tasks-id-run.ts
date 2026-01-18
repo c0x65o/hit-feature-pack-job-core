@@ -30,7 +30,7 @@ function loadTasksManifest(): Record<string, ManifestTask> {
   return tasks || {};
 }
 
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(request: NextRequest, { params }: RouteParams): Promise<Response> {
   try {
     const denied = await requireJobCoreExecute(request);
     if (denied) return denied;

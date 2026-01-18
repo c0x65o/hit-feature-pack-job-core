@@ -16,6 +16,6 @@ export async function requireJobCoreEntityAuthz(
   });
 }
 
-export async function requireJobCoreExecute(request: Request) {
+export async function requireJobCoreExecute(request: Request): Promise<Response | null> {
   return requireActionPermission(request, 'job-core.list.execute', { logPrefix: 'Job-Core' });
 }
