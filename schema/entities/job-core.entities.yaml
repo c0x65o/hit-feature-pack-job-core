@@ -9,20 +9,12 @@ entities:
       resource: tasks
     security:
       list:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: list, verb: read, require_mode: any }
       detail:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: list, verb: read, require_mode: any }
       new:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: list, verb: write }
       edit:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: list, verb: write }
     meta:
       titleSingular: Job
@@ -99,20 +91,12 @@ entities:
       resource: executions
     security:
       list:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: results, verb: read, require_mode: any }
       detail:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: results, verb: read, require_mode: any }
       new:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: results, verb: write }
       edit:
-        roles: []
-        default_roles_allow: [admin]
         authz: { entity: results, verb: write }
     meta:
       titleSingular: Execution
